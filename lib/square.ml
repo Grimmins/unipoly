@@ -1,6 +1,4 @@
 
-module Square = struct 
-
   type ufr = Math | Info | Physique | SVT | Economie | Lettres | Langues | Hggsp
   type degre = None | Licence | Master | Doctorat
 
@@ -35,5 +33,12 @@ module Square = struct
   | Cost of cost
   | Restaurant of restaurant
 
-
-end
+  let get_price = function
+    | House -> 100
+    | Library _ -> 200
+    | Cours c -> c.price
+    | Holiday -> 50
+    | Cheating -> 100
+    | HouseCheating -> 200
+    | Cost c -> c.price
+    | Restaurant _ -> 150

@@ -1,8 +1,0 @@
-(executable
- (name main )
- (modules main board square game player)
- )
-
-(library
- (name square)
- (modules square))
