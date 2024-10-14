@@ -23,8 +23,8 @@
     name : string;
   }
 
-  type square =
-    House 
+  type square_type =
+   House
   | Library of library 
   | Cours of cours
   | Holiday
@@ -32,6 +32,11 @@
   | HouseCheating
   | Cost of cost
   | Restaurant of restaurant
+
+type square = {
+    square_type: square_type;
+    players: Player.player list;
+}
 
   let get_price = function
     | House -> 100
