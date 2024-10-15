@@ -1,22 +1,26 @@
 open Unipoly 
 
+(* Create a board with 40 squares *)
+let board : Board.board = [|
+  Square.create_square Holiday;
+  Square.create_cours Math 25 "Géologie";
+  Square.create_square House;
+  Square.create_cours SVT 25 "Biologie";
+  Square.create_cours SVT 25 "Chimie";
+  Square.create_square (Library {name = "Bibliothèque"});
+  Square.create_cours Physique 25 "Optique";
+  Square.create_cours Physique 25 "Electronique";
+  Square.create_cours Physique 25 "Mécanique";
+  Square.create_square House
+  |]
 
-(*let board : Square.square list = [
-  House;
-  Library {name = "Bibliotheque"};
-  Cours {ufr = Math; price = 100; degre = Licence; name = "Mathematiques"};
-  Cours {ufr = Info; price = 100; degre = Licence; name = "Informatique"};
-  Cours {ufr = Physique; price = 100; degre = Licence; name = "Physique"};
-  Cours {ufr = SVT; price = 100; degre = Licence; name = "SVT"};
-  Cours {ufr = Economie; price = 100; degre = Licence; name = "Economie"};
-  Cours {ufr = Lettres; price = 100; degre = Licence; name = "Lettres"};
-  Cours {ufr = Langues; price = 100; degre = Licence; name = "Langues"};
-  Cours {ufr = Hggsp; price = 100; degre = Licence; name = "HGGSP"};
-  Holiday;
-  Cheating;
-  HouseCheating;
-  Cost {price = 50; name = "Cantine"};
-  Restaurant {name = "Restaurant"};
-]*)
+(* Main game loop *)
+let rec play board () = 
+  Board.show_board board ();
+  print_endline "";
+  print_endline "Appuyez sur Entrée pour terminer votre tour, ou tapez 'end' pour terminer le jeu : ";
+  match read_line () with
+  | "end" -> exit 0
+  | _ -> play board () 
 
-let () = Board.show_board ()
+let () = play board ()

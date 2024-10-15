@@ -1,7 +1,7 @@
 
-  
-  type board = Square.square list
-  let show_board () = 
+type board = Square.square array
+  let show_board (board : board) () = 
+    board.(0).players |> List.iter (fun player -> print_endline (Player.name_player player));
 
     print_endline "____________________________________________________________________________________";
     print_endline "|Vacances |Géolog|      | Bio  |Chimie|Bibli |Optiqu| Elec |      | Meca |Suspicion|";
