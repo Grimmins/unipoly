@@ -1,20 +1,17 @@
 type player = {
     name : string;
-    mutable position : int;
+    position : int; (* En programmation fonctionnel pas de mutable !! *)
     money : int;
-    properties : int list;
 }
 
 (* créer un joueur, initial pos : 0, money : 0, sans propriétés *)
-let create_player name = { name; position = 0; money = 0; properties = [] }
+let create_player name = { name; position = 0; money = 0;}
 
 (* return pos du joueur *)
 let pos_player player = player.position
 
 (* change pos du joueur *)
-let change_pos player new_pos =
-    player.position <- new_pos;
-    player
+let change_pos player new_pos = { player with position = new_pos }
 
 (* return nom joueur *)
 let name_player player = player.name
