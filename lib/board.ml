@@ -1,4 +1,6 @@
 
+  
+  type board = Square.square list
   let show_board () = 
 
     print_endline "____________________________________________________________________________________";
@@ -37,7 +39,3 @@
     print_endline "|  |      |Anglai|Italie|      |Allema|      |      |Philo |      |Litter|         |";
     print_endline "|  |______|      |      |      |      |      |      |      |      |      |         |";
     print_endline "|_________|______|______|______|______|______|______|______|______|______|_________|";
-
-
-
-
