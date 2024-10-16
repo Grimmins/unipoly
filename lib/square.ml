@@ -38,6 +38,10 @@ type square = {
     players: Player.player list;
 }
 
+  let create_square square_type = { square_type ; players = [] }
+
+  let create_cours ufr price name = { square_type = Cours { ufr; price; degre = None; name }; players = [] }
+
   let get_price = function
     | House -> 100
     | Library _ -> 200
@@ -47,3 +51,4 @@ type square = {
     | HouseCheating -> 200
     | Cost c -> c.price
     | Restaurant _ -> 150
+
