@@ -1,26 +1,17 @@
 open Unipoly 
 
-(* Create a board with 40 squares *)
-let board : Board.board = [|
-  Square.create_square Holiday;
-  Square.create_cours Math 25 "Géologie";
-  Square.create_square House;
-  Square.create_cours SVT 25 "Biologie";
-  Square.create_cours SVT 25 "Chimie";
-  Square.create_square (Library {name = "Bibliothèque"});
-  Square.create_cours Physique 25 "Optique";
-  Square.create_cours Physique 25 "Electronique";
-  Square.create_cours Physique 25 "Mécanique";
-  Square.create_square House
-  |]
+let board = Board.init_board ()
+let game_state = Game.create_game board [|Player.create_player "Joueur 1"; Player.create_player "Joueur 2"|]
 
 (* Main game loop *)
-let rec play board () = 
-  Board.show_board board ();
-  print_endline "";
-  print_endline "Appuyez sur Entrée pour terminer votre tour, ou tapez 'end' pour terminer le jeu : ";
-  match read_line () with
-  | "end" -> exit 0
-  | _ -> play board () 
+let rec play board = 
+  Board.display board;
+  Game.act game_state.current_player Roll game_state |> function outcome -> match outcome with
+  | Next game_state ->  
+    print_endline "";
+    print_endline "Appuyez sur Entrée pour terminer votre tour, ou tapez 'end' pour terminer le jeu : ";
+     match read_line () with
+      | "end" -> exit 0
+      | _ -> play game_state.board
 
-let () = play board ()
+let () = play board

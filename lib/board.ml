@@ -1,6 +1,7 @@
 
 type board = Square.square array
-  let show_board (board : board) () = 
+
+  let display (board : board) = 
     board.(0).players |> List.iter (fun player -> print_endline (Player.name_player player));
 
     print_endline "____________________________________________________________________________________";
@@ -38,4 +39,19 @@ type board = Square.square array
     print_endline "|  |Triche|%_____|%_____|      |%_____| BNF  |      |&_____|      |&_____| Maison  |";
     print_endline "|  |      |Anglai|Italie|      |Allema|      |      |Philo |      |Litter|         |";
     print_endline "|  |______|      |      |      |      |      |      |      |      |      |         |";
-    print_endline "|_________|______|______|______|______|______|______|______|______|______|_________|";
+    print_endline "|_________|______|______|______|______|______|______|______|______|______|_________|";;
+
+
+
+  let init_board () = [|
+  Square.create_square Holiday;
+  Square.create_cours Math 25 "Géologie";
+  Square.create_square House;
+  Square.create_cours SVT 25 "Biologie";
+  Square.create_cours SVT 25 "Chimie";
+  Square.create_square (Library {name = "Bibliothèque"});
+  Square.create_cours Physique 25 "Optique";
+  Square.create_cours Physique 25 "Electronique";
+  Square.create_cours Physique 25 "Mécanique";
+  Square.create_square House
+  |] 
