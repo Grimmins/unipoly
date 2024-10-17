@@ -14,7 +14,7 @@
   name : string;
   }
 
-  type cost = {
+  type tax = {
     price : int;
     name : string;
   }
@@ -25,12 +25,14 @@
 
   type square_type =
    House
+  | Email
+  | StLife
   | Library of library 
   | Cours of cours
   | Holiday
   | Cheating
   | HouseCheating
-  | Cost of cost
+  | Tax of tax
   | Restaurant of restaurant
 
 type square = {
@@ -49,6 +51,7 @@ type square = {
     | Holiday -> 50
     | Cheating -> 100
     | HouseCheating -> 200
-    | Cost c -> c.price
+    | Tax c -> c.price
     | Restaurant _ -> 150
+    | _ -> 0
 
