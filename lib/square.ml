@@ -14,7 +14,7 @@
   name : string;
   }
 
-  type cost = {
+  type tax = {
     price : int;
     name : string;
   }
@@ -25,22 +25,23 @@
 
   type square_type =
    House
+  | Email
+  | StLife
   | Library of library 
   | Cours of cours
   | Holiday
   | Cheating
   | HouseCheating
-  | Cost of cost
+  | Tax of tax
   | Restaurant of restaurant
 
 type square = {
     square_type: square_type;
-    players: Player.player list;
 }
 
-  let create_square square_type = { square_type ; players = [] }
+  let create_square square_type = { square_type }
 
-  let create_cours ufr price name = { square_type = Cours { ufr; price; degre = None; name }; players = [] }
+  let create_cours ufr price name = { square_type = Cours { ufr; price; degre = None; name };}
 
   let get_price = function
     | House -> 100
@@ -49,6 +50,7 @@ type square = {
     | Holiday -> 50
     | Cheating -> 100
     | HouseCheating -> 200
-    | Cost c -> c.price
+    | Tax c -> c.price
     | Restaurant _ -> 150
+    | _ -> 0
 

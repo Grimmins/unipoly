@@ -26,7 +26,7 @@ let roll_dices () =
 let rec act player play game_state = 
   match play with
   | Roll -> roll_dices () |> fun (n,m) -> act player (Move (n + m)) game_state  (* TODO : Rajouter condition prison *)
-  | Move n -> change_pos player (pos_player player + n) |> fun player ->  Next {game_state with current_player = player}
+  | Move n -> change_pos player (pos_player player + n) |> fun player -> (* changer player dans list players *)  Next {game_state with current_player = player}
   (* | Buy -> buy player game_state *)
   (* | End -> end_turn player game_state *)
   (* | Pay -> pay player game_state *)
