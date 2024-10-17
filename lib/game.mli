@@ -1,0 +1,2 @@
+type game_state
+
