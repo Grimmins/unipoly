@@ -7,6 +7,8 @@ type game_state = {
 type play = 
   | Roll
   | Move of int
+  | Buy of Square.square_buyable
+  
  
 type outcome = 
   | Next of game_state

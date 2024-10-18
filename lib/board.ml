@@ -56,7 +56,7 @@ let get_infos (board : Square.square array) (players : Player.player array) (k :
          if List.mem k [2; 7; 17; 22; 33; 36] then
            "  "  (* Afficher "  " pour les cases spécifiques *)
          else
-           string_of_int (get_price board.(k).square_type) ^ "k"  (* Afficher le prix sinon *)
+           string_of_int (get_price board.(k)) ^ "k"  (* Afficher le prix sinon *)
      | _ -> get_players list_players padding_size  (* Afficher les joueurs s'il y en a *)
    in
 
@@ -111,45 +111,45 @@ let display (board : board) (players : player array) =
 
 
 let init_board () = [|
-  Square.create_square House;
+  House;
   Square.create_cours Lettres 60 "Littérature";
-  Square.create_square Email;
+  Email;
   Square.create_cours Lettres 60 "Philosophie";
-  Square.create_square (Tax {price = 200; name = "Examens"});
-  Square.create_square (Library {name = "Bibliothèque"});
+  (Tax {price = 200; name = "Examens"});
+  create_buyable (Library {name = "Bibliothèque"});
   Square.create_cours Langues 100 "Allemand";
-  Square.create_square StLife;
+  StLife;
   Square.create_cours Langues 100 "Italien";
   Square.create_cours Langues 120 "Anglais";
-  Square.create_square HouseCheating;
+  HouseCheating;
   Square.create_cours Hggsp 140 "Histoire";
-  Square.create_square (Restaurant {name = "Crous"});
+  create_buyable (Restaurant {name = "Crous"});
   Square.create_cours Hggsp 140 "Géographie";
   Square.create_cours Hggsp 160 "Droit";
-  Square.create_square (Library {name = "Bibliothèque"});
+  create_buyable (Library {name = "Bibliothèque"});
   Square.create_cours Economie 180 "Sociologie";
-  Square.create_square Email;
+  Email;
   Square.create_cours Economie 180 "Finances";
   Square.create_cours Economie 200 "Marketing";
-  Square.create_square Holiday;
+  Holiday;
   Square.create_cours SVT 220 "Géologie";
-  Square.create_square StLife;
+  StLife;
   Square.create_cours SVT 220 "Biologie";
   Square.create_cours SVT 240 "Chimie";
-  Square.create_square (Library {name = "Bibliothèque"});
+  create_buyable (Library {name = "Bibliothèque"});
   Square.create_cours Physique 260 "Optique";
   Square.create_cours Physique 260 "Electronique";
-  Square.create_square (Restaurant {name = "Barge"});
+  create_buyable (Restaurant {name = "Barge"});
   Square.create_cours Physique 280 "Mécanique";
-  Square.create_square Cheating;
+  Cheating;
   Square.create_cours Math 300 "Probabilités";
   Square.create_cours Math 300 "Analyse";
-  Square.create_square Email;
+  Email;
   Square.create_cours Math 320 "Algèbre";
-  Square.create_square (Library {name = "Bibliothèque"});
-  Square.create_square StLife;
+  create_buyable (Library {name = "Bibliothèque"});
+  StLife;
   Square.create_cours Info 350 "Algorithmie";
-  Square.create_square (Tax {price = 100; name = "Frais de scolarité"});
+  (Tax {price = 100; name = "Frais de scolarité"});
   Square.create_cours Info 400 "OCaml";
   |]
 

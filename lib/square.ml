@@ -1,3 +1,4 @@
+open Player
 
   type ufr = Math | Info | Physique | SVT | Economie | Lettres | Langues | Hggsp
   type degre = None | Licence | Master | Doctorat
@@ -5,7 +6,6 @@
   type cours = {
   ufr : ufr;
   price : int;
-  (* proprietaire : Joueur.joueur; *)
   degre : degre;
   name : string;
   }
@@ -23,34 +23,64 @@
     name : string;
   }
 
-  type square_type =
+  type square_buyable_type =
+  | Cours of cours
+  | Library of library
+  | Restaurant of restaurant
+
+  type square_buyable = {
+    type_square : square_buyable_type;
+    proprietaire : player option;
+    }
+
+
+  type square =
    House
   | Email
   | StLife
-  | Library of library 
-  | Cours of cours
+  | Buyable of square_buyable
   | Holiday
   | Cheating
   | HouseCheating
   | Tax of tax
-  | Restaurant of restaurant
 
-type square = {
-    square_type: square_type;
-}
+  let create_cours ufr price name = Buyable {type_square = Cours { ufr; price; degre = None; name }; proprietaire = None}
 
-  let create_square square_type = { square_type }
+  let create_buyable = function 
+    | Library l -> Buyable {type_square = Library l; proprietaire = None}
+    | Restaurant r -> Buyable {type_square = Restaurant r; proprietaire = None}
+    | Cours c -> Buyable {type_square = Cours c; proprietaire = None}
 
-  let create_cours ufr price name = { square_type = Cours { ufr; price; degre = None; name };}
+  let price_buyable = function
+  | Cours c -> c.price
+  | Library _ -> 200
+  | Restaurant _ -> 150
 
   let get_price = function
-    | House -> 100
-    | Library _ -> 200
-    | Cours c -> c.price
-    | Holiday -> 50
-    | Cheating -> 100
-    | HouseCheating -> 200
     | Tax c -> c.price
-    | Restaurant _ -> 150
+    | Buyable b -> 
+      price_buyable b.type_square
     | _ -> 0
+
+  let change_owner square_buyable player =
+    match square_buyable.type_square with
+    | Library l -> Buyable {type_square = Library l; proprietaire = player}
+    | Restaurant r -> Buyable {type_square = Restaurant r; proprietaire = player}
+    | Cours c -> Buyable {type_square = Cours c; proprietaire = player}
+
+  let name_square = function
+  | House -> "Maison"
+  | Email -> "Email"
+  | StLife -> "StLife"
+  | Buyable b -> 
+    (match b.type_square with
+    | Cours c -> c.name
+    | Library l -> l.name
+    | Restaurant r -> r.name)
+  | Holiday -> "Holiday"
+  | Cheating -> "Cheating"
+  | HouseCheating -> "HouseCheating"
+  | Tax t -> t.name
+
+
 
