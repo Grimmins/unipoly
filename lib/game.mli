@@ -10,6 +10,7 @@ type play =
  
 type outcome = 
   | Next of game_state
+  | Error of Error.error
 
 val act : Player.player -> play -> game_state -> outcome
 val create_game : Board.board -> Player.player array -> game_state

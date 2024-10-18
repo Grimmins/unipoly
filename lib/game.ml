@@ -1,6 +1,6 @@
 open Player
 open Board
-(*open Error*)
+open Error
 
 type play = 
   | Roll
@@ -14,8 +14,8 @@ type game_state =
 
   type outcome = 
 | Next of game_state
-(*| Error of error
-| Endgame of player option*)
+  | Error of error
+(*| | Endgame of player option*)
 
 let roll_dices () = 
   let (d1, d2) = (Random.int 6 + 1,
@@ -26,7 +26,12 @@ let roll_dices () =
 let rec act player play game_state = 
   match play with
   | Roll -> roll_dices () |> fun (n,m) -> act player (Move (n + m)) game_state  (* TODO : Rajouter condition prison *)
-  | Move n -> change_pos player (pos_player player + n) |> fun player -> (* changer player dans list players *)  Next {game_state with current_player = player}
+  | Move n -> change_pos player (pos_player player + n) |> fun player -> 
+      (* change player into current_player and players *)
+      match Array.find_index (fun p -> name_player p = name_player player) game_state.players with
+        | Some index -> game_state.players.(index) <- player; Next {game_state with current_player = player}
+        | None -> Error (InvalidPlayer)
+      
   (* | Buy -> buy player game_state *)
   (* | End -> end_turn player game_state *)
   (* | Pay -> pay player game_state *)
