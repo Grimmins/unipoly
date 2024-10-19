@@ -21,3 +21,11 @@ let money_player player = player.money
 
 (* change argent joueur *)
 let change_money player new_money = { player with money = player.money + new_money }
+
+let find_index_player player players : int option =
+    let n = Array.length players in
+    let rec loop i =
+      if i = n then None
+      else if name_player players.(i) == name_player player then Some i
+      else loop (i + 1) in
+    loop 0

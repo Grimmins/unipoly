@@ -1,7 +1,8 @@
 open Player
 
   type ufr = Math | Info | Physique | SVT | Economie | Lettres | Langues | Hggsp
-  type degre = None | Licence | Master | Doctorat
+  type degre_type = Licence | Master | Doctorat
+  type degre = degre_type option
 
   type cours = {
   ufr : ufr;
