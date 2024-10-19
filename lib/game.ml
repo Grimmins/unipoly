@@ -9,9 +9,9 @@ type play =
   | Buy of square_buyable
 
 type game_state = 
-  { board : board
-  ; players : player array
-  ; current_player : player
+  { board : board;
+   players : player array;
+   current_index_player : int
   }
 
   type outcome = 
@@ -24,14 +24,15 @@ let roll_dices () =
   Random.int 6 + 1) in 
   print_endline ("Résultat des dés : " ^ string_of_int d1 ^ " , " ^ string_of_int d2);
   (d1, d2)
-
-
   
 (* Handle the int option when finding the index of player *)
 let handle_index_player player game_state f  = 
   match find_index_player player game_state.players with
   | Some index -> f index
   | None -> Error (InvalidPlayer)
+
+let end_turn game_state = 
+    Next {game_state with current_index_player = (game_state.current_index_player + 1) mod Array.length game_state.players}
 
 let rec act player play game_state = 
   match play with
@@ -49,7 +50,7 @@ let rec act player play game_state =
         (let handle_square_result player game_state (square : square) = 
           match square with
           | Buyable square_buyable -> act player (Buy square_buyable) game_state
-          | _ -> Next {game_state with current_player = player}
+          | _ -> end_turn game_state
            in handle_square_result player game_state game_state.board.(pos_player player))
         )
 
@@ -59,16 +60,12 @@ let rec act player play game_state =
       else 
         change_money player (- price_buyable square_buyable.type_square) |> fun player -> 
         change_owner square_buyable (Some player) |> fun square -> 
-
-          handle_index_player player game_state (fun index ->
               
-            (game_state.players.(index) <- player;
+            game_state.players.(game_state.current_index_player) <- player;
             game_state.board.(pos_player player) <- square;
             (* TODO : pas dans la même fonction*)
             print_endline (name_player player ^ " a acheté " ^ string_of_int (price_buyable square_buyable.type_square) ^ "€ " ^ name_square square);
-            Next {game_state with current_player = player})
-
-        )
+            end_turn game_state
       
 
   (* | End -> end_turn player game_state *)
@@ -80,5 +77,5 @@ let rec act player play game_state =
 let create_game board players = 
   { board
   ; players
-  ; current_player = players.(0)
+  ; current_index_player = 0
   }
