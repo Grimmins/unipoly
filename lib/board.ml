@@ -81,7 +81,8 @@ let get_infos (board : Square.square array) (players : Player.player array) (k :
    let padding_size =
      match k with
      | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 -> 6
-     | 11 | 13 | 14 | 16 | 18 | 19 | 31 | 32 | 34 | 37 | 39 -> 7
+     | 11 | 13 | 14 | 16 | 18 | 19 | 31 | 32 | 34 | 35 | 37 | 39 -> 7
+     | 12 | 15 -> 8
      | _ -> 9  (* Par défaut, le padding est de 9 pour les autres cas *)
    in
 
@@ -121,31 +122,31 @@ let display (board : board) (players : player array) =
   print_endline "|         |______|      |______|______|      |______|______|      |______|De Triche|";
   print_endline ("|_________|\027[42m*__"^ (prop 21)^"__\027[0m|______|\027[42m*__"^ (prop 23)^"__\027[0m|\027[42m*__"^ (prop 24)^"__\027[0m|__"^ (prop 25)^"___|\027[46m°__"^ (prop 26)^"__\027[0m|\027[46m°__"^ (prop 27)^"__\027[0m|__"^ (prop 28)^"___|\027[46m°__"^ (prop 29)^"__\027[0m|_________|");
   print_endline "|Marketi|\027[103m$\027[0m|                                                              |\027[45m+\027[0m| Proba |";
-  print_endline ("|"^ (infos 19) ^"|\027[103m"^ (prop 19)^"\027[0m|                                                              |\027[45m \027[0m|"^ (infos 31) ^"|");
+  print_endline ("|"^ (infos 19) ^"|\027[103m"^ (prop 19)^"\027[0m|                                                              |\027[45m"^ (prop 31)^"\027[0m|"^ (infos 31) ^"|");
   print_endline "|_______|\027[103m_\027[0m|                                                              |\027[45m_\027[0m|_______|";
   print_endline "|Finance|\027[103m$\027[0m|                                                              |\027[45m+\027[0m|Analyse|";
-  print_endline ("|"^ (infos 18) ^"|\027[103m"^ (prop 18)^"\027[0m|                                                              |\027[45m \027[0m|"^ (infos 32) ^"|");
+  print_endline ("|"^ (infos 18) ^"|\027[103m"^ (prop 18)^"\027[0m|                                                              |\027[45m"^ (prop 32)^"\027[0m|"^ (infos 32) ^"|");
   print_endline "|_______|\027[103m_\027[0m|                                                              |\027[45m_\027[0m|_______|";
   print_endline "|         |                                                              |         |";
-  print_endline ("|"^ (infos 17) ^"|                                                              |"^ (infos 33) ^"|");
+  print_endline ("|"^ (infos 17) ^ "|                                                              |"^ (infos 33) ^"|");
   print_endline "|_________|                                                              |_________|";
   print_endline "| Socio |\027[103m$\027[0m|                                                              |\027[45m+\027[0m|Algèbre|";
-  print_endline ("|"^ (infos 16) ^"|\027[103m"^ (prop 16)^"\027[0m|                                                              |\027[45m \027[0m|"^ (infos 34) ^"|");
+  print_endline ("|"^ (infos 16) ^"|\027[103m"^ (prop 16)^"\027[0m|                                                              |\027[45m"^ (prop 34)^"\027[0m|"^ (infos 34) ^"|");
   print_endline "|_______|\027[103m_\027[0m|                                                              |\027[45m_\027[0m|_______|";
   print_endline "|  Bibli  |                                                              |  Bibli  |";
-  print_endline ("|"^ (infos 15) ^"|                                                              |"^ (infos 35) ^"|");
+  print_endline ("|"^ (infos 15) ^ (prop 15)^"|                                                              |"^ (prop 35) ^ (infos 35) ^"|");
   print_endline "|_________|                                                              |_________|";
   print_endline "| Droit |\027[44m^\027[0m|                                                              |         |";
   print_endline ("|"^ (infos 14) ^"|\027[44m"^ (prop 14)^"\027[0m|                                                              |"^ (infos 36) ^"|");
   print_endline "|_______|\027[44m_\027[0m|                                                              |_________|";
   print_endline "|Géograp|\027[44m^\027[0m|                                                              |\027[100m#\027[0m| Algo  |";
-  print_endline ("|"^ (infos 13) ^"|\027[44m"^ (prop 13)^"\027[0m|                                                              |\027[100m \027[0m|"^ (infos 37) ^"|");
+  print_endline ("|"^ (infos 13) ^"|\027[44m"^ (prop 13)^"\027[0m|                                                              |\027[100m"^ (prop 37)^"\027[0m|"^ (infos 37) ^"|");
   print_endline "|_______|\027[44m_\027[0m|                                                              |\027[100m_\027[0m|_______|";
   print_endline "|         |                                                              |         |";
-  print_endline ("|"^ (infos 12) ^"|                                                              |"^ (infos 38) ^"|");
+  print_endline ("|"^ (infos 12) ^ (prop 12)^"|                                                              |"^ (infos 38) ^"|");
   print_endline "|_________|                                                              |_________|";
   print_endline "|Histoir|\027[44m^\027[0m|                                                              |\027[100m#\027[0m| OCaml |";
-  print_endline ("|"^ (infos 11) ^"|\027[44m"^ (prop 11)^"\027[0m|                                                              |\027[100m \027[0m|"^ (infos 39) ^"|");
+  print_endline ("|"^ (infos 11) ^"|\027[44m"^ (prop 11)^"\027[0m|                                                              |\027[100m"^ (prop 39)^"\027[0m|"^ (infos 39) ^"|");
   print_endline "|_______|\027[44m_\027[0m|______________________________________________________________|\027[100m_\027[0m|_______|";
   print_endline ("|  |Triche|\027[102m%__"^ (prop 9)^"__\027[0m|\027[102m%__"^ (prop 8)^"__\027[0m|      |\027[102m%__"^ (prop 6)^"__\027[0m|  "^ (prop 5)^"   |Examen|\027[41m&__"^ (prop 3)^"__\027[0m|      |\027[41m&__"^ (prop 1)^"__\027[0m| Maison  |");
   print_endline ("|  |"^ (infos_j 10) ^"|Anglai|Italie|      |Allema| BNF  |      |Philo |      |Litter|         |");
