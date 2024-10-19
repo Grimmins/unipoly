@@ -24,6 +24,7 @@ let roll_dices () =
   Random.int 6 + 1) in 
   print_endline ("Résultat des dés : " ^ string_of_int d1 ^ " , " ^ string_of_int d2);
   (d1, d2)
+  (* (0, 1) pour les tests *)
 
 
   
@@ -40,7 +41,7 @@ let rec act player play game_state =
   | Roll -> roll_dices () |> fun (n,m) -> act player (Move (n + m)) game_state  (* TODO : Rajouter condition prison *)
 
   (* déplacement du joueur *)
-  | Move n -> change_pos player (pos_player player + n) |> fun player -> 
+  | Move n -> change_pos player ((pos_player player + n) mod 40) |> fun player ->
       (* change player into current_player and players *)
       handle_index_player player game_state (fun index ->
 
