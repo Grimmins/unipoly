@@ -1,7 +1,7 @@
 type game_state = {
   board : Board.board;
   players : Player.player array;
-  current_player : Player.player;
+  current_index_player : int;
 }
 
 type play = 
