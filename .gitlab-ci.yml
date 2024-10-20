@@ -24,13 +24,7 @@ stages:          # List of stages for jobs, and their order of execution
 
 build-job:       # This job runs in the build stage, which runs first.
   before_script: 
-    - git clone https://github.com/ocaml/opam.git
-    - cd opam
-    - make cold
-    - mkdir -p $HOME/.local/bin
-    - cp opam $HOME/.local/bin/
-    - export PATH=$HOME/.local/bin:$PATH
-    - source ~/.bashrc
+    - apt-get install wget
     - opam install dune
   stage: build
   script:
