@@ -27,13 +27,15 @@ let get_players (list_players : player list) (padding_size : int) : string =
     let players_str =
       match name_list with
       | [p1] -> "@" ^ p1  (* Un seul joueur *)
-      | [p1; p2] -> " @" ^ p1 ^ " @" ^ p2 ^ " "  (* Deux joueurs *)
+      | [p1; p2] -> "@" ^ p1 ^ "@" ^ p2 ^ " "  (* Deux joueurs *)
       | [p1; p2; p3] -> "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3  (* Trois joueurs *)
       | [p1; p2; p3; p4] ->
           if padding_size > 7 then
             "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3 ^ "@" ^ p4  (* Affiche le 4ème joueur si padding > 7 *)
+          else if padding_size = 7 then
+            "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3 ^ "@"  (* Affiche le 4ème joueur si padding > 7 *)
           else
-            "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3 ^ "@"  (* Sinon, seulement les 3 premiers joueurs *)
+            "@" ^ p1 ^ "@" ^ p2 ^ p3 ^ p4  (* Sinon, seulement les 3 premiers joueurs *)
       | _ -> ""  (* Aucun joueur ou plus de 4 joueurs, cas non géré ici *)
     in
 
