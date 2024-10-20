@@ -24,10 +24,8 @@ stages:          # List of stages for jobs, and their order of execution
 
 build-job:       # This job runs in the build stage, which runs first.
   before_script: 
-    - wget https://opam.ocaml.org/install.sh
-    - sh install.sh --prefix=$HOME/.local
-    - export PATH=$HOME/.local/bin:$PATH
-    - source ~/.bashrc
+    - apt-get install curl
+    - bash -c "sh <(curl -fsSL https://opam.ocaml.org/install.sh)"
     - opam install dune
   stage: build
   script:
