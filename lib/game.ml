@@ -26,7 +26,6 @@ let roll_dices () =
   (0, 1)
   (* (0, 1) pour les tests *)
 
-
   
 (* Handle the int option when finding the index of player *)
 let handle_index_player player game_state f  = 
@@ -46,8 +45,7 @@ let rec act player play game_state =
       handle_index_player player game_state (fun index ->
 
         game_state.players.(index) <- player; 
-
-        (let handle_square_result player game_state (square : square) = 
+        (let handle_square_result player game_state (square : square) =
           match square with
           | Buyable square_buyable -> act player (Buy square_buyable) game_state
           | _ -> Next {game_state with current_player = player}

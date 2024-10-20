@@ -7,7 +7,7 @@ let get_prop (board : Square.square array) (k : int) =
   let square = board.(k) in
   let char =
     match k with
-    | 1 | 3 | 5 | 6 | 8 | 9 | 21 | 23 | 24 | 25 | 26 | 27 | 28 | 29 -> "_"
+    | 1 | 3 | 6 | 8 | 9 | 21 | 23 | 24 | 25 | 26 | 27 | 28 | 29 -> "_"
     | _ -> " "
   in
   match square with
@@ -81,8 +81,8 @@ let get_infos (board : Square.square array) (players : Player.player array) (k :
    let padding_size =
      match k with
      | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 -> 6
-     | 11 | 13 | 14 | 16 | 18 | 19 | 31 | 32 | 34 | 35 | 37 | 39 -> 7
-     | 12 | 15 -> 8
+     | 11 | 13 | 14 | 16 | 18 | 19 | 31 | 32 | 34 | 37 | 39 -> 7
+     | 12 | 15 | 35 -> 8
      | _ -> 9  (* Par défaut, le padding est de 9 pour les autres cas *)
    in
 
@@ -90,7 +90,7 @@ let get_infos (board : Square.square array) (players : Player.player array) (k :
    let content = 
      match nb_players with
      | 0 ->
-         if List.mem k [2; 7; 17; 22; 33; 36] then
+         if List.mem k [0; 2; 7; 17; 20; 22; 30; 33; 36] then
            "  "  (* Afficher "  " pour les cases spécifiques *)
          else
            string_of_int (get_price board.(k)) ^ "k"  (* Afficher le prix sinon *)
