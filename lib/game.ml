@@ -23,7 +23,7 @@ let roll_dices () =
   let (d1, d2) = (Random.int 6 + 1,
   Random.int 6 + 1) in 
   print_endline ("Résultat des dés : " ^ string_of_int d1 ^ " , " ^ string_of_int d2);
-  (0, 1)
+  (d1, d2)
   
 (* Handle the int option when finding the index of player *)
 let handle_index_player player game_state f  = 
