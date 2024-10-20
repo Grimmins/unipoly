@@ -41,13 +41,12 @@ let rec act player play game_state =
   | Roll -> roll_dices () |> fun (n,m) -> act player (Move (n + m)) game_state  (* TODO : Rajouter condition prison *)
 
   (* déplacement du joueur *)
-  | Move n -> change_pos player (pos_player player + n) |> fun player -> 
+  | Move n -> change_pos player ((pos_player player + n) mod 40) |> fun player ->
       (* change player into current_player and players *)
       handle_index_player player game_state (fun index ->
 
         game_state.players.(index) <- player; 
-
-        (let handle_square_result player game_state (square : square) = 
+        (let handle_square_result player game_state (square : square) =
           match square with
           | Buyable square_buyable -> act player (Buy square_buyable) game_state
           | _ -> end_turn game_state
