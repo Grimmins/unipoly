@@ -39,6 +39,24 @@ build:
 
   extends: .build-matrix # defines OCAML_COMPILER
 
+  cache:
+    # https://docs.gitlab.com/ee/ci/yaml/#cache
+    key: $OCAML_COMPILER
+    # keep a distinct cache for each compiler version
+    paths:
+      - _opam
+      # Reusing the same opam environment over a long time might result into
+      # unnatural choice of dependencies: repeatedly installing and updating
+      # dependencies may result in a different solver choices than doing
+      # a fresh setup.
+      #
+      # You can manually clean the _opam cache by running a manual pipeline
+      # with the variable CLEAN_OPAM_CACHE set to "true".
+
+      - _build
+      # You can manually clean the dune _build cache by running a manual pipeline
+      # with the variable CLEAN_DUNE_CACHE set to "true".
+
   # run this job only if a 'dune-project' file exists;
   # (In particular, this will not run in your "pages" branch
   # if it does not itself use Dune.)
