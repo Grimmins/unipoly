@@ -39,19 +39,6 @@ build:
 
   extends: .build-matrix # defines OCAML_COMPILER
 
-  variables:
-    ARTIFACTS: "artifacts/$OCAML_COMPILER"
-    # a local shortcut for the per-compiler artifact repository
-
-    FF_USE_FASTZIP: "true"
-    # A workaround against a bug in gitlab-runner's default
-    # unzipping implementation, which partially breaks caching for the dune _build cache.
-    # See https://gitlab.com/gitlab-org/gitlab-runner/-/issues/27496 for more details.
-
-  artifacts:
-    paths:
-      - artifacts/$OCAML_COMPILER
-
   # run this job only if a 'dune-project' file exists;
   # (In particular, this will not run in your "pages" branch
   # if it does not itself use Dune.)
@@ -66,8 +53,7 @@ build:
   image: ocaml/opam:debian-testing-opam
 
   script:
-    - opam init --bare
-    - opam switch create $OCAML_COMPILER
+    - opam switch create --yes --no-install . $OCAML_COMPILER
     - opam switch $OCAML_COMPILER
     - eval $(opam env)
     - opam install dune
@@ -79,19 +65,6 @@ test:
 
 
   extends: .build-matrix # defines OCAML_COMPILER
-
-  variables:
-    ARTIFACTS: "artifacts/$OCAML_COMPILER"
-    # a local shortcut for the per-compiler artifact repository
-
-    FF_USE_FASTZIP: "true"
-    # A workaround against a bug in gitlab-runner's default
-    # unzipping implementation, which partially breaks caching for the dune _build cache.
-    # See https://gitlab.com/gitlab-org/gitlab-runner/-/issues/27496 for more details.
-
-  artifacts:
-    paths:
-      - artifacts/$OCAML_COMPILER
 
   # run this job only if a 'dune-project' file exists;
   # (In particular, this will not run in your "pages" branch
@@ -127,8 +100,7 @@ test:
       # with the variable CLEAN_DUNE_CACHE set to "true".
 
   script:
-    - opam init --bare
-    - opam switch create $OCAML_COMPILER
+    - opam switch create --yes --no-install . $OCAML_COMPILER
     - opam switch $OCAML_COMPILER
     - eval $(opam env)
     - opam install dune
