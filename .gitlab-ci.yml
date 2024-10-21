@@ -72,7 +72,6 @@ build:
 
   script:
     - opam switch create --yes --no-install . $OCAML_COMPILER
-    - opam switch $OCAML_COMPILER
     - eval $(opam env)
     - opam install dune
     - echo "Installation de dune réussie"
@@ -119,7 +118,6 @@ test:
 
   script:
     - opam switch create --yes --no-install . $OCAML_COMPILER
-    - opam switch $OCAML_COMPILER
     - eval $(opam env)
     - opam install dune
     - dune test
