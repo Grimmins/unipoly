@@ -1,46 +1,190 @@
-# This file is a template, and might need editing before it works on your project.
-# This is a sample GitLab CI/CD configuration file that should run without any modifications.
-# It demonstrates a basic 3 stage CI/CD pipeline. Instead of real tests or scripts,
-# it uses echo commands to simulate the pipeline execution.
-#
-# A pipeline is composed of independent jobs that run scripts, grouped into stages.
-# Stages run in sequential order, but jobs within stages run in parallel.
-#
-# For more information, see: https://docs.gitlab.com/ee/ci/yaml/index.html#stages
-#
-# You can copy and paste this template into a new `.gitlab-ci.yml` file.
-# You should not add this template to an existing `.gitlab-ci.yml` file by using the `include:` keyword.
-#
-# To contribute improvements to CI/CD templates, please follow the Development guide at:
-# https://docs.gitlab.com/ee/development/cicd/templates.html
-# This specific template is located at:
-# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
+# This reusable CI script is licensed under the MIT license.
+# See the complete license text at the end.
+
+### Configuration section
+
+# The versions of the compiler to test the project against.
+.build-matrix:
+  parallel:
+    # https://docs.gitlab.com/ee/ci/yaml/README.html#parallel-matrix-jobs
+    matrix:
+    # - OCAML_COMPILER: "4.00.1"
+    # - OCAML_COMPILER: "4.01.0"
+    # - OCAML_COMPILER: "4.02.1"
+    # - OCAML_COMPILER: "4.02.3"
+    # - OCAML_COMPILER: "4.03.0"
+    # - OCAML_COMPILER: "4.04.2"
+    # - OCAML_COMPILER: "4.05.0"
+    # - OCAML_COMPILER: "4.06.1"
+    # - OCAML_COMPILER: "4.07.1"
+    # - OCAML_COMPILER: "4.08.1"
+    # - OCAML_COMPILER: "4.09.1"
+    # - OCAML_COMPILER: "4.10.0"
+    - OCAML_COMPILER: "4.11.1"
+
+variables:
+
+  DUNE_FLAGS: "--error-reporting twice --display short"
+  # Set DUNE_FLAGS to customize the flags given to dune when building.
+  # [--error-reporting twice] was introduced in dune 3.0. If you plan to use older
+  # version of dune, remove this part.
+
+  DUNE_BUILD_TARGETS: "@all"
+  DUNE_TEST_TARGETS: "@runtest"
+  DUNE_DOC_TARGETS: "@doc"
+  # If you make one of these variables empty (: ""),
+  # the corresponding build step will be skipped.
+  # Setting them to other values can refine the build
+  # process, for example "@foo/runtest @bar/runtest" would only
+  # run the tests inside directories 'foo/' and 'bar/'
+  # (see Dune documentation on target aliases).
 
 
 
-stages:          # List of stages for jobs, and their order of execution
-  - build
-  - test
+### Stages
 
-build-job:       # This job runs in the build stage, which runs first.
-  before_script: 
-    - apt-get install wget
-    - opam install dune
+stages:
+  - build        # build the project 
+  - test       # run its tests
+
+
+### Build stage
+#
+# build the project and run its tests
+
+build:
   stage: build
+
+  extends: .build-matrix # defines OCAML_COMPILER
+
+  variables:
+    ARTIFACTS: "artifacts/$OCAML_COMPILER"
+    # a local shortcut for the per-compiler artifact repository
+
+    FF_USE_FASTZIP: "true"
+    # A workaround against a bug in gitlab-runner's default
+    # unzipping implementation, which partially breaks caching for the dune _build cache.
+    # See https://gitlab.com/gitlab-org/gitlab-runner/-/issues/27496 for more details.
+
+  artifacts:
+    paths:
+      - artifacts/$OCAML_COMPILER
+
+  # run this job only if a 'dune-project' file exists;
+  # (In particular, this will not run in your "pages" branch
+  # if it does not itself use Dune.)
+  rules:
+    # https://docs.gitlab.com/ee/ci/yaml/#rules
+    - exists:
+        - dune-project
+
+  # This CI script uses a local switch, so we don't need
+  # a docker image with a pre-installed OCaml version, just opam.
+  # See https://hub.docker.com/r/ocaml/opam/ for other images.
+  image: ocaml/opam:debian-testing-opam
+
+  # We use a local opam switch in `./_opam` that is cached
+  # by Gitlab, and reused across all branches and pull requests.
+  cache:
+    # https://docs.gitlab.com/ee/ci/yaml/#cache
+    key: $OCAML_COMPILER
+    # keep a distinct cache for each compiler version
+    paths:
+      - _opam
+      # Reusing the same opam environment over a long time might result into
+      # unnatural choice of dependencies: repeatedly installing and updating
+      # dependencies may result in a different solver choices than doing
+      # a fresh setup.
+      #
+      # You can manually clean the _opam cache by running a manual pipeline
+      # with the variable CLEAN_OPAM_CACHE set to "true".
+
+      - _build
+      # You can manually clean the dune _build cache by running a manual pipeline
+      # with the variable CLEAN_DUNE_CACHE set to "true".
+
   script:
-    - echo "Compiling the code..."
+
+    - opam install dune
+    - echo "Installation de dune réussie"
     - dune build
-    - echo "Compile complete."
 
-unit-test-job:   # This job runs in the test stage.
-  stage: test    # It only starts when the job in the build stage completes successfully.
+test:
+  stage: test
+
+
+  extends: .build-matrix # defines OCAML_COMPILER
+
+  variables:
+    ARTIFACTS: "artifacts/$OCAML_COMPILER"
+    # a local shortcut for the per-compiler artifact repository
+
+    FF_USE_FASTZIP: "true"
+    # A workaround against a bug in gitlab-runner's default
+    # unzipping implementation, which partially breaks caching for the dune _build cache.
+    # See https://gitlab.com/gitlab-org/gitlab-runner/-/issues/27496 for more details.
+
+  artifacts:
+    paths:
+      - artifacts/$OCAML_COMPILER
+
+  # run this job only if a 'dune-project' file exists;
+  # (In particular, this will not run in your "pages" branch
+  # if it does not itself use Dune.)
+  rules:
+    # https://docs.gitlab.com/ee/ci/yaml/#rules
+    - exists:
+        - dune-project
+
+  # This CI script uses a local switch, so we don't need
+  # a docker image with a pre-installed OCaml version, just opam.
+  # See https://hub.docker.com/r/ocaml/opam/ for other images.
+  image: ocaml/opam:debian-testing-opam
+
+  # We use a local opam switch in `./_opam` that is cached
+  # by Gitlab, and reused across all branches and pull requests.
+  cache:
+    # https://docs.gitlab.com/ee/ci/yaml/#cache
+    key: $OCAML_COMPILER
+    # keep a distinct cache for each compiler version
+    paths:
+      - _opam
+      # Reusing the same opam environment over a long time might result into
+      # unnatural choice of dependencies: repeatedly installing and updating
+      # dependencies may result in a different solver choices than doing
+      # a fresh setup.
+      #
+      # You can manually clean the _opam cache by running a manual pipeline
+      # with the variable CLEAN_OPAM_CACHE set to "true".
+
+      - _build
+      # You can manually clean the dune _build cache by running a manual pipeline
+      # with the variable CLEAN_DUNE_CACHE set to "true".
+
   script:
-    - echo "Running unit tests..."
+    - opam install dune
     - dune test
-    - echo "Test complete."
 
-# lint-test-job:   # This job also runs in the test stage.
-  #stage: test    # It can run at the same time as unit-test-job (in parallel).
-  #script:
-  #  - echo "Linting code... This will take about 10 seconds."
-   # - echo "No lint issues found."
+  
+## MIT License
+#
+# Copyright 2021 Gabriel Scherer
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files
+# (the "Software"), to deal in the Software without restriction,
+# including without limitation the rights to use, copy, modify, merge,
+# publish, distribute, sublicense, and/or sell copies of the Software,
+# and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
