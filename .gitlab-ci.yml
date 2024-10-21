@@ -66,7 +66,10 @@ build:
   image: ocaml/opam:debian-testing-opam
 
   script:
-    - opam switch
+    - opam init --bare
+    - opam switch create $OCAML_COMPILER
+    - opam switch $OCAML_COMPILER
+    - eval $(opam env)
     - opam install dune
     - echo "Installation de dune réussie"
     - dune build
@@ -124,7 +127,10 @@ test:
       # with the variable CLEAN_DUNE_CACHE set to "true".
 
   script:
-    - opam switch
+    - opam init --bare
+    - opam switch create $OCAML_COMPILER
+    - opam switch $OCAML_COMPILER
+    - eval $(opam env)
     - opam install dune
     - dune test
 
