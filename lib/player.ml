@@ -3,10 +3,11 @@ type player = {
     position : int; (* En programmation fonctionnel pas de mutable !! *)
     money : int;
     mutable in_jail : bool;
+    mutable has_alibi : bool;
 }
 
 (* créer un joueur, initial pos : 0, money : 0, sans propriétés *)
-let create_player name = { name; position = 0; money = 15000; in_jail = false;}
+let create_player name = { name; position = 0; money = 15000; in_jail = false; has_alibi = false}
 
 (* return pos du joueur *)
 let pos_player player = player.position
@@ -19,6 +20,14 @@ let send_to_jail (player: player) =
 
 let release_from_jail (player: player) =
   player.in_jail <- false
+
+let receive_alibi_card (player: player) =
+    player.has_alibi <- true
+
+let use_alibi_card (player: player) =
+    player.has_alibi <- false
+
+let can_use_alibi (player: player) = player.has_alibi
 
 (* return nom joueur *)
 let name_player player = player.name

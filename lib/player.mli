@@ -18,4 +18,10 @@ val send_to_jail : player -> unit
 
 val release_from_jail : player -> unit
 
+val receive_alibi_card : player -> unit
+
+val use_alibi_card : player -> unit
+
+val can_use_alibi : player -> bool
+
 val find_index_player : player -> player array -> int option
