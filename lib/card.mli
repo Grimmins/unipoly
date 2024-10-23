@@ -1,6 +1,6 @@
 open Player
 
-type action
+type _action
 
 type card
 

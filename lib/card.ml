@@ -1,18 +1,18 @@
 open Player
 
-type action =
+type _action =
   | Move of int (* move player of n squares *)
   | GainMoney of int  (* player win some money *)
   | LoseMoney of int  (* player loose some money *)
   | GoTo of int  (* player sent to a specific square *)
-  | SkipTurn  (* player pass turn *)
-  | GetOutOfJail  (* alibi card for cheat *)
+ (* | SkipTurn   player pass turn *)
+ (* | GetOutOfJail  alibi card for cheat *)
 
 (* def card *)
 type card = {
-  name: string;
-  description: string;  (* description card *)
-  effect: action;  (* action effect *)
+  _name: string;
+  _description: string;  (* description card *)
+  effect: _action;  (* action effect *)
 }
 
 let apply_card_effect (player: player) (card: card) : player =
