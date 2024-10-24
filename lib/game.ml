@@ -9,14 +9,20 @@ type play =
   | Buy of square_buyable
   | PayOwner of square_buyable
 
-type game_state = 
-  { board : board;
-   players : player array;
-   current_index_player : int
-  }
+type timeline  = 
+  | Start
+  | EndTurn
+  | HandleSquare of square
+
+type game_state = {
+  board : Board.board;
+  players : Player.player array;
+  current_index_player : int;
+  has_to_replay : bool;
+  timeline : timeline;
+}
 
   type outcome = 
-  | HandleSquare of square
   | Next of game_state
   | Error of error
 (*| | Endgame of player option*)
@@ -26,10 +32,8 @@ let roll_dices () =
   Random.int 6 + 1) in 
   print_endline "";
   print_endline ("Résultat des dés : " ^ string_of_int d1 ^ " , " ^ string_of_int d2);
+  if d1 = d2 then print_endline "Double !";
   (d1, d2)
-
-
-
 
 (* Handle the int option when finding the index of player *)
 let handle_index_player player game_state f  = 
@@ -37,16 +41,13 @@ let handle_index_player player game_state f  =
   | Some index -> f index
   | None -> Error (InvalidPlayer)
 
-let end_turn game_state = 
-    Next {game_state with current_index_player = (game_state.current_index_player + 1) mod Array.length game_state.players}
-
-
 
 let rec act player play game_state = 
   match play with
 
   (* lancer de dés *)
-  | Roll -> roll_dices () |> fun (n,m) -> act player (Move (n + m)) game_state  (* TODO : Rajouter condition prison *)
+  (* TODO : Rajouter condition prison *)
+  | Roll -> roll_dices () |> fun (n,m) -> (act player (Move (n + m)) {game_state with has_to_replay = (n = m)})
 
   (* déplacement du joueur *)
   | Move n -> change_pos player ((pos_player player + n) mod 40) |> fun player ->
@@ -56,7 +57,7 @@ let rec act player play game_state =
         game_state.players.(index) <- player; 
         display game_state.board game_state.players;
 
-        HandleSquare (game_state.board.(pos_player player)))
+        Next {game_state with timeline = HandleSquare game_state.board.(pos_player player)})
 
   (* achat d'une propriété *)
    | Buy square_buyable -> 
@@ -69,7 +70,7 @@ let rec act player play game_state =
             game_state.board.(pos_player player) <- square;
             (* TODO : pas dans la même fonction*)
             print_endline (name_player player ^ " a acheté " ^ string_of_int (price_buyable square_buyable.type_square) ^ "€ " ^ name_square square);
-            end_turn game_state  
+            Next {game_state with timeline = EndTurn}
       
   (* paiement au propriétaire *)
   | PayOwner square_buyable -> 
@@ -82,7 +83,7 @@ let rec act player play game_state =
         game_state.players.(game_state.current_index_player) <- player;
         game_state.players.(find_index_player owner game_state.players |> Option.get) <- owner;
         print_endline (name_player player ^ " a payé " ^ name_player owner ^ " " ^ string_of_int (price_buyable square_buyable.type_square) ^ "€");
-        end_turn game_state
+        Next {game_state with timeline = EndTurn}
     | None -> Error (NoOwner))
 
   (* | End -> end_turn player game_state *)
@@ -92,9 +93,11 @@ let rec act player play game_state =
 
 
 let create_game board players = 
-  { board
-  ; players
-  ; current_index_player = 0
+  { board;
+   players;
+   current_index_player = 0;
+    has_to_replay = false;
+    timeline = Start;
   }
 
 (* demande d'achat d'une propriété *)
