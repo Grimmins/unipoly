@@ -13,13 +13,13 @@ let rec play (game_state : game_state) =
 
   (* End the turn *)
   let endturn game_state = 
-    match game_state.has_to_replay with
-    | true -> play game_state
-    | false -> (print_endline "";
+    (print_endline "";
       print_endline "Appuyez sur Entrée pour terminer votre tour, ou tapez 'end' pour terminer le jeu : ";
       match read_line () with
         | "end" -> exit 0
-        | _ -> play {game_state with current_index_player = (game_state.current_index_player + 1) mod (Array.length game_state.players); has_to_replay = false; timeline= Start}) in
+        | _ -> match game_state.has_to_replay with
+        | true -> play game_state
+        | false -> play {game_state with current_index_player = (game_state.current_index_player + 1) mod (Array.length game_state.players); has_to_replay = false; timeline= Start}) in
 
   (Board.display game_state.board game_state.players;
 
