@@ -69,6 +69,9 @@ open Player
     | Restaurant r -> Buyable {type_square = Restaurant r; proprietaire = player}
     | Cours c -> Buyable {type_square = Cours c; proprietaire = player}
 
+  let get_owner square_buyable =
+    square_buyable.proprietaire
+
   let name_square = function
   | House -> "Maison"
   | Email -> "Email"
