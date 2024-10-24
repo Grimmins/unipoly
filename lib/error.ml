@@ -5,3 +5,4 @@ type error =
   | InvalidBoard
   | InvalidSquare
   | NotEnoughMoney
+  | NoOwner

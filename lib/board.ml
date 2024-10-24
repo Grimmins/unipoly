@@ -126,13 +126,13 @@ let display (board : board) (players : player array) =
   print_endline "|Marketi|\027[103m$\027[0m|                                                              |\027[45m+\027[0m| Proba |";
   print_endline ("|"^ (infos 19) ^"|\027[103m"^ (prop 19)^"\027[0m|                                                              |\027[45m"^ (prop 31)^"\027[0m|"^ (infos 31) ^"|");
   print_endline "|_______|\027[103m_\027[0m|                                                              |\027[45m_\027[0m|_______|";
-  print_endline "|Finance|\027[103m$\027[0m|                                                              |\027[45m+\027[0m|Analyse|";
+  print_endline ("|Finance|\027[103m$\027[0m|                                                              |\027[45m+\027[0m|Analyse|                   " ^ name_player players.(0) ^ " a " ^ string_of_int (money_player players.(0)) ^ "€");
   print_endline ("|"^ (infos 18) ^"|\027[103m"^ (prop 18)^"\027[0m|                                                              |\027[45m"^ (prop 32)^"\027[0m|"^ (infos 32) ^"|");
-  print_endline "|_______|\027[103m_\027[0m|                                                              |\027[45m_\027[0m|_______|";
+  print_endline ("|_______|\027[103m_\027[0m|                                                              |\027[45m_\027[0m|_______|                   " ^ name_player players.(1) ^ " a " ^ string_of_int (money_player players.(1)) ^ "€");
   print_endline "|  Email  |                                                              |  Email  |";
-  print_endline ("|"^ (infos 17) ^ "|                                                              |"^ (infos 33) ^"|");
+  print_endline ("|"^ (infos 17) ^ "|                                                              |"^ (infos 33) ^"|                   " ^ name_player players.(2) ^ " a " ^ string_of_int (money_player players.(2)) ^ "€");
   print_endline "|_________|                                                              |_________|";
-  print_endline "| Socio |\027[103m$\027[0m|                                                              |\027[45m+\027[0m|Algèbre|";
+  print_endline ("| Socio |\027[103m$\027[0m|                                                              |\027[45m+\027[0m|Algèbre|                   " ^ name_player players.(3) ^ " a " ^ string_of_int (money_player players.(3)) ^ "€");
   print_endline ("|"^ (infos 16) ^"|\027[103m"^ (prop 16)^"\027[0m|                                                              |\027[45m"^ (prop 34)^"\027[0m|"^ (infos 34) ^"|");
   print_endline "|_______|\027[103m_\027[0m|                                                              |\027[45m_\027[0m|_______|";
   print_endline "|  Bibli  |                                                              |  Bibli  |";
