@@ -1,4 +1,3 @@
-open Player
 open Card
 
 type deck = card list

@@ -18,9 +18,9 @@ val send_to_jail : player -> unit
 
 val release_from_jail : player -> unit
 
-val receive_alibi_card : player -> unit
+val receive_alibi_card : player -> player
 
-val use_alibi_card : player -> unit
+val use_alibi_card : player -> player
 
 val can_use_alibi : player -> bool
 
