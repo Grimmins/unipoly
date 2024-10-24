@@ -119,9 +119,9 @@ let display (board : board) (players : player array) =
 
   (* Affichage du plateau *)
   print_endline "____________________________________________________________________________________";
-  print_endline "|Vacances |Géolog|      | Bio  |Chimie|Bibli |Optiqu| Elec |      | Meca |Suspicion|";
+  print_endline "|Vacances |Géolog| Vie  | Bio  |Chimie|Bibli |Optiqu| Elec |      | Meca |Suspicion|";
   print_endline ("|"^ (infos 20) ^"|"^ (infos 21) ^"|"^ (infos 22) ^"|"^ (infos 23) ^"|"^ (infos 24) ^"|"^ (infos 25) ^"|"^ (infos 26) ^"|"^ (infos 27) ^"|"^ (infos 28) ^"|"^ (infos 29) ^"|"^ (infos 30) ^"|");
-  print_endline "|         |______|      |______|______|      |______|______|      |______|De Triche|";
+  print_endline "|         |______|étudia|______|______|      |______|______|      |______|De Triche|";
   print_endline ("|_________|\027[42m*__"^ (prop 21)^"__\027[0m|______|\027[42m*__"^ (prop 23)^"__\027[0m|\027[42m*__"^ (prop 24)^"__\027[0m|__"^ (prop 25)^"___|\027[46m°__"^ (prop 26)^"__\027[0m|\027[46m°__"^ (prop 27)^"__\027[0m|__"^ (prop 28)^"___|\027[46m°__"^ (prop 29)^"__\027[0m|_________|");
   print_endline "|Marketi|\027[103m$\027[0m|                                                              |\027[45m+\027[0m| Proba |";
   print_endline ("|"^ (infos 19) ^"|\027[103m"^ (prop 19)^"\027[0m|                                                              |\027[45m"^ (prop 31)^"\027[0m|"^ (infos 31) ^"|");
@@ -129,7 +129,7 @@ let display (board : board) (players : player array) =
   print_endline "|Finance|\027[103m$\027[0m|                                                              |\027[45m+\027[0m|Analyse|";
   print_endline ("|"^ (infos 18) ^"|\027[103m"^ (prop 18)^"\027[0m|                                                              |\027[45m"^ (prop 32)^"\027[0m|"^ (infos 32) ^"|");
   print_endline "|_______|\027[103m_\027[0m|                                                              |\027[45m_\027[0m|_______|";
-  print_endline "|         |                                                              |         |";
+  print_endline "|  Email  |                                                              |  Email  |";
   print_endline ("|"^ (infos 17) ^ "|                                                              |"^ (infos 33) ^"|");
   print_endline "|_________|                                                              |_________|";
   print_endline "| Socio |\027[103m$\027[0m|                                                              |\027[45m+\027[0m|Algèbre|";
@@ -138,7 +138,7 @@ let display (board : board) (players : player array) =
   print_endline "|  Bibli  |                                                              |  Bibli  |";
   print_endline ("|"^ (infos 15) ^ (prop 15)^"|                                                              |"^ (prop 35) ^ (infos 35) ^"|");
   print_endline "|_________|                                                              |_________|";
-  print_endline "| Droit |\027[44m^\027[0m|                                                              |         |";
+  print_endline "| Droit |\027[44m^\027[0m|                                                              |Vie étudi|";
   print_endline ("|"^ (infos 14) ^"|\027[44m"^ (prop 14)^"\027[0m|                                                              |"^ (infos 36) ^"|");
   print_endline "|_______|\027[44m_\027[0m|                                                              |_________|";
   print_endline "|Géograp|\027[44m^\027[0m|                                                              |\027[100m#\027[0m| Algo  |";
@@ -150,8 +150,8 @@ let display (board : board) (players : player array) =
   print_endline "|Histoir|\027[44m^\027[0m|                                                              |\027[100m#\027[0m| OCaml |";
   print_endline ("|"^ (infos 11) ^"|\027[44m"^ (prop 11)^"\027[0m|                                                              |\027[100m"^ (prop 39)^"\027[0m|"^ (infos 39) ^"|");
   print_endline "|_______|\027[44m_\027[0m|______________________________________________________________|\027[100m_\027[0m|_______|";
-  print_endline ("|  |Triche|\027[102m%__"^ (prop 9)^"__\027[0m|\027[102m%__"^ (prop 8)^"__\027[0m|      |\027[102m%__"^ (prop 6)^"__\027[0m|  "^ (prop 5)^"   |Examen|\027[41m&__"^ (prop 3)^"__\027[0m|      |\027[41m&__"^ (prop 1)^"__\027[0m| Maison  |");
-  print_endline ("|  |"^ (infos_j 10) ^"|Anglai|Italie|      |Allema| BNF  |      |Philo |      |Litter|         |");
+  print_endline ("|  |Triche|\027[102m%__"^ (prop 9)^"__\027[0m|\027[102m%__"^ (prop 8)^"__\027[0m|  Vie |\027[102m%__"^ (prop 6)^"__\027[0m|  "^ (prop 5)^"   |Examen|\027[41m&__"^ (prop 3)^"__\027[0m|      |\027[41m&__"^ (prop 1)^"__\027[0m| Maison  |");
+  print_endline ("|  |"^ (infos_j 10) ^"|Anglai|Italie|étudia|Allema| BNF  |      |Philo |Email |Litter|         |");
   print_endline ("|  |______|"^ (infos 9) ^"|"^ (infos 8) ^"|"^ (infos 7) ^"|"^ (infos 6) ^"|"^ (infos 5) ^"|"^ (infos 4) ^"|"^ (infos 3) ^"|"^ (infos 2) ^"|"^ (infos 1) ^"|"^ (infos 0) ^"|");
   print_endline ("|_"^ (infos 10) ^"|______|______|______|______|______|______|______|______|______|_________|");;
 
