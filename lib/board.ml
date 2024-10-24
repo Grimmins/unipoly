@@ -26,16 +26,16 @@ let get_players (list_players : player list) (padding_size : int) : string =
     (* Construire la chaîne représentant les joueurs avec les séparateurs (@) *)
     let players_str =
       match name_list with
-      | [p1] -> "@" ^ p1  (* Un seul joueur *)
-      | [p1; p2] -> "@" ^ p1 ^ "@" ^ p2 ^ " "  (* Deux joueurs *)
-      | [p1; p2; p3] -> "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3  (* Trois joueurs *)
+      | [p1] -> "\027[107m" ^ "@" ^ p1 ^ "\027[0m" (* Un seul joueur *)
+      | [p1; p2] -> "\027[107m" ^ "@" ^ p1 ^ "@" ^ p2  ^ "\027[0m "  (* Deux joueurs *)
+      | [p1; p2; p3] -> "\027[107m" ^ "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3 ^ "\027[0m"  (* Trois joueurs *)
       | [p1; p2; p3; p4] ->
           if padding_size > 7 then
-            "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3 ^ "@" ^ p4  (* Affiche le 4ème joueur si padding > 7 *)
+            "\027[107m" ^ "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3 ^ "@" ^ p4 ^ "\027[0m"  (* Affiche le 4ème joueur si padding > 7 *)
           else if padding_size = 7 then
-            "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3 ^ "@"  (* Affiche le 4ème joueur si padding > 7 *)
+            "\027[107m" ^ "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3 ^ "@" ^ "\027[0m"  (* Affiche le 4ème joueur si padding > 7 *)
           else
-            "@" ^ p1 ^ "@" ^ p2 ^ p3 ^ p4  (* Sinon, seulement les 3 premiers joueurs *)
+            "\027[107m" ^ "@" ^ p1 ^ "@" ^ p2 ^ p3 ^ p4 ^ "\027[0m"  (* Sinon, seulement les 3 premiers joueurs *)
       | _ -> ""  (* Aucun joueur ou plus de 4 joueurs, cas non géré ici *)
     in
 
@@ -57,17 +57,17 @@ let infos_j (list_players: Player.player list) (is_jail : bool) : string =
   let cheaters, passersby = List.partition (fun p -> is_in_jail p) list_players in
   if is_jail then (* display des joueurs triche*)
     match List.map name_player cheaters with
-    | [p1] -> "@" ^ p1 ^ "    "
-    | [p1; p2] -> "@" ^ p1 ^ "@" ^ p2 ^ "  "
-    | [p1; p2; p3] -> "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3
-    | [p1; p2; p3; p4] -> "@" ^ p1 ^ "@" ^ p2 ^ p3 ^ p4
+    | [p1] -> "\027[107m" ^ "@" ^ p1  ^ "\027[0m" ^ "    "
+    | [p1; p2] -> "\027[107m" ^ "@" ^ p1 ^ "@" ^ p2  ^ "\027[0m" ^ "  "
+    | [p1; p2; p3] -> "\027[107m" ^ "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3 ^ "\027[0m"
+    | [p1; p2; p3; p4] -> "\027[107m" ^ "@" ^ p1 ^ "@" ^ p2 ^ p3 ^ p4 ^ "\027[0m"
     | _ -> "      "
   else (* display des passants jail*)
     match List.map name_player passersby with
-    | [p1] -> "@" ^ p1 ^ "______"
-    | [p1; p2] -> "@" ^ p1 ^ "@" ^ p2 ^ "____"
-    | [p1; p2; p3] -> "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3 ^ "__"
-    | [p1; p2; p3; p4] -> "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3 ^ "@" ^ p4
+    | [p1] -> "\027[107m" ^ "@" ^ p1  ^ "\027[0m" ^ "______"
+    | [p1; p2] -> "\027[107m" ^ "@" ^ p1 ^ "@" ^ p2  ^ "\027[0m" ^ "____"
+    | [p1; p2; p3] -> "\027[107m" ^ "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3  ^ "\027[0m" ^ "__"
+    | [p1; p2; p3; p4] -> "\027[107m" ^ "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3 ^ "@" ^ p4 ^ "\027[0m"
     | _ -> "________"
 
 

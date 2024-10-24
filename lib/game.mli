@@ -11,8 +11,7 @@ type play =
   | PayOwner of Square.square_buyable
   
  
-type outcome = 
-  | HandleSquare of Square.square
+type outcome =
   | Next of game_state
   | Error of Error.error
 
