@@ -85,6 +85,3 @@ open Player
   | Cheating -> "Cheating"
   | HouseCheating -> "HouseCheating"
   | Tax t -> t.name
-
-
-

@@ -19,3 +19,5 @@ val send_to_jail : player -> unit
 val release_from_jail : player -> unit
 
 val find_index_player : player -> player array -> int option
+
+val toogle_to_jail : player -> bool -> player

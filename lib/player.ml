@@ -39,3 +39,5 @@ let find_index_player player players : int option =
       else if name_player players.(i) == name_player player then Some i
       else loop (i + 1) in
     loop 0
+
+let toogle_to_jail player b = {player with in_jail = b}

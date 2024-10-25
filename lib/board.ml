@@ -199,3 +199,11 @@ let init_board () = [|
   Square.create_cours Info 400 "OCaml";
   |]
 
+
+let index_square (square : Square.square) board = 
+  let n = Array.length board in
+    let rec loop i =
+      if i = n then None
+      else if board.(i) == square then Some i
+      else loop (i + 1) in
+    loop 0

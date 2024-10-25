@@ -5,11 +5,14 @@ type play =
   | Move of int
   | Buy of Square.square_buyable
   | PayOwner of Square.square_buyable
+  | Goto of int
+  | PayJail
 
 type timeline = 
 | Start
 | EndTurn
 | HandleSquare of Square.square
+| HandleJail
 
 type game_state = {
   board : Board.board;

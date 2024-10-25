@@ -18,8 +18,9 @@ let rec play (game_state : game_state) =
       match read_line () with
         | "end" -> exit 0
         | _ -> match game_state.has_to_replay with
-        | true -> play game_state
-        | false -> play {game_state with current_index_player = (game_state.current_index_player + 1) mod (Array.length game_state.players); has_to_replay = false; timeline= Start}) in
+          | true -> play game_state
+          | false -> play {game_state with current_index_player = (game_state.current_index_player + 1) mod (Array.length game_state.players); has_to_replay = false; timeline= Start}) 
+      in
 
   (Board.display game_state.board game_state.players;
 
@@ -45,10 +46,23 @@ let rec play (game_state : game_state) =
           | Some owner -> 
             print_endline ("Cette propriété appartient à " ^ Player.name_player owner);
             turn (PayOwner square_buyable) game_state)
+      
+      | Square.Cheating -> 
+        print_endline "Vous avez triché ! Vous êtes envoyé en prison !";
+        game_state.players.(game_state.current_index_player) <- Player.toogle_to_jail game_state.players.(game_state.current_index_player) true;
+        turn (Goto 10) game_state;
 
       | _ -> endturn game_state)
-
+    
+    | HandleJail -> let rec ask_jail () = (print_endline "";
+        print_endline "Voulez-vous payer pour sortir de prison ? (y/n) ";
+        match read_line () with
+          | "y" -> turn (PayJail) game_state
+          | "n" -> endturn game_state
+          | _ -> ask_jail ())
+        in ask_jail ()
     | EndTurn -> endturn game_state) 
+    
     
      in turn Roll game_state)
     

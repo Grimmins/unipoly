@@ -8,11 +8,14 @@ type play =
   | Move of int
   | Buy of square_buyable
   | PayOwner of square_buyable
+  | Goto of int
+  | PayJail
 
 type timeline  = 
   | Start
   | EndTurn
   | HandleSquare of square
+  | HandleJail
 
 type game_state = {
   board : Board.board;
@@ -42,12 +45,21 @@ let handle_index_player player game_state f  =
   | None -> Error (InvalidPlayer)
 
 
+
 let rec act player play game_state = 
   match play with
 
   (* lancer de dés *)
-  (* TODO : Rajouter condition prison *)
-  | Roll -> roll_dices () |> fun (n,m) -> (act player (Move (n + m)) {game_state with has_to_replay = (n = m)})
+  | Roll -> roll_dices () |> fun (n,m) -> 
+      (* Le joueur est en prison *)
+      ( if Player.is_in_jail player then
+
+          (if n = m then (print_endline "Vous sortez de prison"; act player Roll game_state)
+          else Next {game_state with timeline = HandleJail})
+      
+      (* Le joueur n'est pas en prison *)
+      else act player (Move (n + m)) {game_state with has_to_replay = (n = m)};
+      )
 
   (* déplacement du joueur *)
   | Move n -> change_pos player ((pos_player player + n) mod 40) |> fun player ->
@@ -86,10 +98,18 @@ let rec act player play game_state =
         Next {game_state with timeline = EndTurn}
     | None -> Error (NoOwner))
 
-  (* | End -> end_turn player game_state *)
-  (* | Pay -> pay player game_state *)
-  (* | Endgame -> endgame player game_state *)
-  (* | Error -> Error (Error.create_error "Erreur") *)
+  | Goto i -> (
+    (* TODO : Gérer passage case départ *)
+    game_state.players.(game_state.current_index_player) <- change_pos player i;
+    Next {game_state with timeline = HandleSquare game_state.board.(i)}
+  )
+
+  | PayJail -> (
+    (* TODO : Change 500 with constant *)
+    if money_player player < 500 then Error (NotEnoughMoney)
+    else (change_money player (- 500) |> fun player -> 
+      game_state.players.(game_state.current_index_player) <- toogle_to_jail player false;
+      Next {game_state with timeline = Start}))
 
 
 let create_game board players = 
