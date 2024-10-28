@@ -2,23 +2,18 @@ type player = {
     name : string;
     position : int; (* En programmation fonctionnel pas de mutable !! *)
     money : int;
-    mutable in_jail : bool;
+    in_jail : bool;
+    turn_in_jail : int;
 }
 
 (* créer un joueur, initial pos : 0, money : 0, sans propriétés *)
-let create_player name = { name; position = 0; money = 15000; in_jail = false;}
+let create_player name = { name; position = 0; money = 15000; in_jail = false; turn_in_jail = 0}
 
 (* return pos du joueur *)
 let pos_player player = player.position
 
 (* change pos du joueur *)
 let change_pos player new_pos = { player with position = new_pos }
-
-let send_to_jail (player: player) =
-  player.in_jail <- true
-
-let release_from_jail (player: player) =
-  player.in_jail <- false
 
 (* return nom joueur *)
 let name_player player = player.name
@@ -39,3 +34,9 @@ let find_index_player player players : int option =
       else if name_player players.(i) == name_player player then Some i
       else loop (i + 1) in
     loop 0
+
+let toogle_to_jail player b = {player with in_jail = b}
+
+let add_turn_jail player = {player with turn_in_jail = player.turn_in_jail + 1}
+
+let get_turn_jail player = player.turn_in_jail

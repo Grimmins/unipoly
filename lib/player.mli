@@ -14,8 +14,10 @@ val money_player : player -> int
 
 val change_money : player -> int -> player
 
-val send_to_jail : player -> unit
-
-val release_from_jail : player -> unit
-
 val find_index_player : player -> player array -> int option
+
+val toogle_to_jail : player -> bool -> player
+
+val add_turn_jail : player -> player
+
+val get_turn_jail : player -> int

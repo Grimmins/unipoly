@@ -7,12 +7,13 @@ type play =
   | Roll
   | Move of int
   | Buy of square_buyable
-  | PayOwner of square_buyable
+  | PayJail
 
 type timeline  = 
   | Start
   | EndTurn
   | HandleSquare of square
+  | HandleJail
 
 type game_state = {
   board : Board.board;
@@ -26,6 +27,16 @@ type game_state = {
   | Next of game_state
   | Error of error
 (*| | Endgame of player option*)
+
+let get_current_player game_state = game_state.players.(game_state.current_index_player)
+
+let update_current_player game_state player = game_state.players.(game_state.current_index_player) <- player
+
+let has_to_replay game_state = game_state.has_to_replay
+
+let end_turn game_state = {game_state with current_index_player = (game_state.current_index_player + 1) mod (Array.length game_state.players); has_to_replay = false; timeline= Start}
+
+let get_timeline game_state = game_state.timeline
 
 let roll_dices () = 
   let (d1, d2) = (Random.int 6 + 1,
@@ -41,13 +52,47 @@ let handle_index_player player game_state f  =
   | Some index -> f index
   | None -> Error (InvalidPlayer)
 
+(* paiement au propriétaire *)
+let pay_owner game_state player square_buyable = 
+  (match get_owner square_buyable with
+    | Some owner -> 
+      if money_player player < price_buyable square_buyable.type_square then Error (NotEnoughMoney)
+      else 
+        change_money player (- (price_buyable square_buyable.type_square)) |> fun player -> 
+        change_money owner (price_buyable square_buyable.type_square) |> fun owner -> 
+          update_current_player game_state player;
+        game_state.players.(find_index_player owner game_state.players |> Option.get) <- owner;
+        print_endline (name_player player ^ " a payé " ^ name_player owner ^ " " ^ string_of_int (price_buyable square_buyable.type_square) ^ "€");
+        Next {game_state with timeline = EndTurn}
+    | None -> Error (NoOwner))
 
 let rec act player play game_state = 
+  let goto game_state player i = 
+    (* TODO : Gérer passage case départ *)
+    update_current_player game_state (change_pos player i);
+    act (get_current_player game_state) (Move 0) game_state in
+
+
   match play with
 
   (* lancer de dés *)
-  (* TODO : Rajouter condition prison *)
-  | Roll -> roll_dices () |> fun (n,m) -> (act player (Move (n + m)) {game_state with has_to_replay = (n = m)})
+  | Roll -> roll_dices () |> fun (n,m) -> 
+      (* Le joueur est en prison *)
+      ( if Player.is_in_jail player then
+
+          (if n = m then (print_endline "Vous sortez de prison"; act player Roll game_state)
+          else (
+            Player.add_turn_jail (get_current_player game_state) |> fun player ->
+            if (Player.get_turn_jail (get_current_player game_state) >= 3) then 
+              ((print_endline "Tour 3 : vous êtes obligé de payer pour sortir de prison"; 
+                  act player PayJail game_state)) 
+            else (
+            update_current_player game_state player;
+            Next {game_state with timeline = HandleJail})))
+      
+      (* Le joueur n'est pas en prison *)
+      else act player (Move (n + m)) {game_state with has_to_replay = (n = m)};
+      )
 
   (* déplacement du joueur *)
   | Move n -> change_pos player ((pos_player player + n) mod 40) |> fun player ->
@@ -57,7 +102,18 @@ let rec act player play game_state =
         game_state.players.(index) <- player; 
         display game_state.board game_state.players;
 
-        Next {game_state with timeline = HandleSquare game_state.board.(pos_player player)})
+        match game_state.board.(pos_player (get_current_player game_state)) with 
+
+          | Buyable square -> (if square.proprietaire != None then pay_owner game_state player square 
+            else Next {game_state with timeline = HandleSquare game_state.board.(pos_player player)})
+
+          | Cheating -> (print_endline "Vous avez triché ! Vous êtes envoyé en prison !";
+          update_current_player game_state (Player.toogle_to_jail (get_current_player game_state) true);
+          goto game_state (get_current_player game_state) 10;)
+            
+
+          | _ ->  Next {game_state with timeline = HandleSquare game_state.board.(pos_player player)}
+            )
 
   (* achat d'une propriété *)
    | Buy square_buyable -> 
@@ -71,25 +127,13 @@ let rec act player play game_state =
             (* TODO : pas dans la même fonction*)
             print_endline (name_player player ^ " a acheté " ^ string_of_int (price_buyable square_buyable.type_square) ^ "€ " ^ name_square square);
             Next {game_state with timeline = EndTurn}
-      
-  (* paiement au propriétaire *)
-  | PayOwner square_buyable -> 
-    (match get_owner square_buyable with
-    | Some owner -> 
-      if money_player player < price_buyable square_buyable.type_square then Error (NotEnoughMoney)
-      else 
-        change_money player (- (price_buyable square_buyable.type_square)) |> fun player -> 
-        change_money owner (price_buyable square_buyable.type_square) |> fun owner -> 
-        game_state.players.(game_state.current_index_player) <- player;
-        game_state.players.(find_index_player owner game_state.players |> Option.get) <- owner;
-        print_endline (name_player player ^ " a payé " ^ name_player owner ^ " " ^ string_of_int (price_buyable square_buyable.type_square) ^ "€");
-        Next {game_state with timeline = EndTurn}
-    | None -> Error (NoOwner))
 
-  (* | End -> end_turn player game_state *)
-  (* | Pay -> pay player game_state *)
-  (* | Endgame -> endgame player game_state *)
-  (* | Error -> Error (Error.create_error "Erreur") *)
+  | PayJail -> (
+    (* TODO : Change 500 with constant *)
+    if money_player player < 500 then Error (NotEnoughMoney)
+    else (change_money player (- 500) |> fun player -> 
+      update_current_player game_state (toogle_to_jail player false);
+      Next {game_state with timeline = Start}))
 
 
 let create_game board players = 
@@ -108,3 +152,63 @@ let ask_buy square_buyable =
     | "y" -> true
     | "n" -> false
     | _ -> print_endline "Veuillez entrer y ou n"; ask_buy () in ask_buy ())
+
+(** [play game_state] is the main function of the game. It displays the board, handles the turn and the end of the turn.
+    @param game_state the current state of the game
+    @return unit
+*)
+let rec play (game_state : game_state) =
+
+  (* End the turn *)
+  let endturn game_state = 
+    (print_endline "";
+      print_endline "Appuyez sur Entrée pour terminer votre tour, ou tapez 'end' pour terminer le jeu : ";
+      match read_line () with
+        | "end" -> exit 0
+        | _ -> match has_to_replay game_state with
+          | true -> play game_state
+          | false -> play (end_turn game_state)) 
+      in
+
+  (Board.display game_state.board game_state.players;
+
+  (* Handle the turn *)
+  let rec turn play game_state  =
+  (act (get_current_player game_state) play game_state |> function outcome -> match outcome with
+
+  (* TODO :  Error handling *)
+  | Error _error -> print_endline "Erreur";
+
+  (* Next turn *)
+  | Next game_state -> match get_timeline game_state with
+    | Start -> turn Roll game_state
+    | HandleSquare square -> (match square with 
+
+      | Square.Buyable square_buyable -> 
+        
+        (match Square.get_owner square_buyable with
+          | None -> ( match (ask_buy square_buyable) with
+              | true -> turn (Buy square_buyable) game_state
+              | false -> endturn game_state)
+
+          (* TODO :  Error handling *)
+          | Some _owner -> print_endline "Erreur")
+
+      | _ -> endturn game_state)
+    
+    | HandleJail -> let rec ask_jail () = (print_endline "";
+        print_endline "Vous êtes en prison. Vous avez 3 tours pour sortir. Vous pouvez payer 500€ pour sortir immédiatement.";
+        print_endline ("Vous avez actuellement " ^ string_of_int (Player.get_turn_jail (get_current_player game_state)) ^ " tours en prison.");
+        print_endline "Voulez-vous payer pour sortir de prison ? (y/n) ";
+        match read_line () with
+          | "y" -> turn (PayJail) game_state
+          | "n" -> (
+            
+            endturn game_state)
+          | _ -> ask_jail ())
+        in ask_jail ()
+    | EndTurn -> endturn game_state) 
+    
+    
+      in turn Roll game_state)
+    
