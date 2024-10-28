@@ -44,7 +44,7 @@ let roll_dices () =
   print_endline "";
   print_endline ("Résultat des dés : " ^ string_of_int d1 ^ " , " ^ string_of_int d2);
   if d1 = d2 then print_endline "Double !";
-  (3, 7)
+  (d1, d2)
 
 (* Handle the int option when finding the index of player *)
 let handle_index_player player game_state f  = 
@@ -81,7 +81,14 @@ let rec act player play game_state =
       ( if Player.is_in_jail player then
 
           (if n = m then (print_endline "Vous sortez de prison"; act player Roll game_state)
-          else Next {game_state with timeline = HandleJail})
+          else (
+            Player.add_turn_jail (get_current_player game_state) |> fun player ->
+            if (Player.get_turn_jail (get_current_player game_state) >= 3) then 
+              ((print_endline "Tour 3 : vous êtes obligé de payer pour sortir de prison"; 
+                  act player PayJail game_state)) 
+            else (
+            update_current_player game_state player;
+            Next {game_state with timeline = HandleJail})))
       
       (* Le joueur n'est pas en prison *)
       else act player (Move (n + m)) {game_state with has_to_replay = (n = m)};
@@ -103,13 +110,7 @@ let rec act player play game_state =
           | Cheating -> (print_endline "Vous avez triché ! Vous êtes envoyé en prison !";
           update_current_player game_state (Player.toogle_to_jail (get_current_player game_state) true);
           goto game_state (get_current_player game_state) 10;)
-
-          | HouseCheating -> (match Player.get_turn_jail (get_current_player game_state) with 
-            | 3 -> (print_endline "Tour 3 : vous êtes obligé de payer pour sortir de prison"; 
-                act player PayJail game_state)
-            | _ ->  Next {game_state with timeline = HandleSquare game_state.board.(pos_player player)}
             
-            )
 
           | _ ->  Next {game_state with timeline = HandleSquare game_state.board.(pos_player player)}
             )
@@ -196,11 +197,13 @@ let rec play (game_state : game_state) =
       | _ -> endturn game_state)
     
     | HandleJail -> let rec ask_jail () = (print_endline "";
+        print_endline "Vous êtes en prison. Vous avez 3 tours pour sortir. Vous pouvez payer 500€ pour sortir immédiatement.";
+        print_endline ("Vous avez actuellement " ^ string_of_int (Player.get_turn_jail (get_current_player game_state)) ^ " tours en prison.");
         print_endline "Voulez-vous payer pour sortir de prison ? (y/n) ";
         match read_line () with
           | "y" -> turn (PayJail) game_state
           | "n" -> (
-            update_current_player game_state (Player.add_turn_jail (get_current_player game_state));
+            
             endturn game_state)
           | _ -> ask_jail ())
         in ask_jail ()
