@@ -1,26 +1,18 @@
-
+type game_state
 
 type play = 
   | Roll
   | Move of int
   | Buy of Square.square_buyable
-  | PayOwner of Square.square_buyable
-  | Goto of int
   | PayJail
 
 type timeline = 
-| Start
-| EndTurn
-| HandleSquare of Square.square
-| HandleJail
+  | Start
+  | EndTurn
+  | HandleSquare of Square.square
+  | HandleJail
 
-type game_state = {
-  board : Board.board;
-  players : Player.player array;
-  current_index_player : int;
-  has_to_replay : bool;
-  timeline : timeline;
-}
+
  
 type outcome =
   | Next of game_state
@@ -46,3 +38,15 @@ val create_game : Board.board -> Player.player array -> game_state
     @return bool
 *)
 val ask_buy : Square.square_buyable -> bool
+
+val get_current_player : game_state -> Player.player
+
+val update_current_player : game_state -> Player.player -> unit
+
+val has_to_replay : game_state -> bool
+
+val end_turn : game_state -> game_state
+
+val get_timeline : game_state -> timeline
+
+val play : game_state -> unit
