@@ -83,7 +83,10 @@ let rec act player play game_state =
       (* Le joueur est en prison *)
       ( if Player.is_in_jail player then
 
-          (if n = m then (print_endline "Vous sortez de prison"; act player Roll game_state)
+          (if n = m then (print_endline "Vous sortez de prison";
+          toogle_to_jail player false |> fun player -> (
+          update_current_player game_state player;
+          act player Roll game_state))
           else (
             Player.add_turn_jail (get_current_player game_state) |> fun player ->
             if (Player.get_turn_jail (get_current_player game_state) >= 3) then
@@ -121,7 +124,7 @@ let rec act player play game_state =
       handle_index_player player game_state (fun index ->
 
         game_state.players.(index) <- player;
-        display game_state.board game_state.players;
+        display game_state.board game_state.players game_state.current_index_player;
 
         match Board.get_square (pos_player (get_current_player game_state)) game_state.board with
 
@@ -209,7 +212,7 @@ let rec play (game_state : game_state) =
           | false -> play (end_turn game_state))
       in
 
-  (Board.display game_state.board game_state.players;
+  (Board.display game_state.board game_state.players game_state.current_index_player;
 
   (* Handle the turn *)
   let rec turn play game_state  =
