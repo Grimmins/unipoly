@@ -71,7 +71,7 @@ let pay_owner game_state player square_buyable =
 
 let rec act player play game_state = 
   let goto game_state player i =
-    (* TODO : Gérer passage case départ *)
+
     update_current_player game_state (change_pos player i);
     act (get_current_player game_state) (Move 0) game_state in
 
@@ -98,7 +98,25 @@ let rec act player play game_state =
       )
 
   (* déplacement du joueur *)
-  | Move n -> change_pos player ((pos_player player + n) mod 40) |> fun player ->
+  | Move n ->
+  (* calcul position *)
+  let old_position = pos_player player in
+      let new_position = (old_position + n) mod 40 in
+    (*traiter si le joueur passe par la case départ (autrement dit si la position passe de x < 40 à x > 0  ET/OU s'arrête sur la case *)
+      let player, stop_on_maison =
+              if new_position = 0 then (
+              print_endline "Vous vous arrêtez quelques jours à la maison, vos parents se montrent plus généreux, recevez 400 €";
+              (change_money player 400, true)
+              )
+              else (player, false)
+          in
+          let player =
+                  if old_position > new_position && not stop_on_maison then (print_endline "Vous êtes de passage chez vous, recevez 200 €";
+                  (change_money player 200)
+                  )
+                  else player
+              in
+  change_pos player new_position |> fun player ->
       (* change player into current_player and players *)
       handle_index_player player game_state (fun index ->
 

@@ -8,7 +8,7 @@ type player = {
 }
 
 (* créer un joueur, initial pos : 0, money : 0, sans propriétés *)
-let create_player name = { name; position = 0; money = 15000; in_jail = false; turn_in_jail = 0; has_alibi = false}
+let create_player name = { name; position = 0; money = 1500; in_jail = false; turn_in_jail = 0; has_alibi = false}
 
 (* return pos du joueur *)
 let pos_player player = player.position
