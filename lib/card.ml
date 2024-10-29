@@ -30,7 +30,7 @@ let apply_card_effect (player: player) (card: card) : player =
       | GainMoney amount -> change_money player (money_player player + amount)
       | LoseMoney amount -> change_money player (money_player player - amount)
       | GoTo position -> change_pos player position
-      | GoToJail -> send_to_jail player; change_pos player 10
+      | GoToJail -> toogle_to_jail player true;
       | GetOutOfJail -> receive_alibi_card player;
      (* | SkipTurn -> { player with skip_turn = true }  on add possibilité de skip turn ? *)
     (*  | GetOutOfJail -> receive_alibi_card player  Le joueur reçoit une carte spéciale *)
