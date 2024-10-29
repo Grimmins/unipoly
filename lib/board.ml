@@ -26,21 +26,21 @@ let get_players (list_players : player list) (padding_size : int) : string =
     (* Construire la chaîne représentant les joueurs avec les séparateurs (@) *)
     let players_str =
       match name_list with
-      | [p1] -> "@" ^ p1  (* Un seul joueur *)
-      | [p1; p2] -> "@" ^ p1 ^ "@" ^ p2 ^ " "  (* Deux joueurs *)
-      | [p1; p2; p3] -> "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3  (* Trois joueurs *)
+      | [p1] -> "\027[107m" ^ "@" ^ p1 ^ "\027[0m" ^ " " (* Un seul joueur *)
+      | [p1; p2] -> "\027[107m" ^ "@" ^ p1 ^ "@" ^ p2  ^ "\027[0m "  (* Deux joueurs *)
+      | [p1; p2; p3] -> "\027[107m" ^ "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3 ^ "\027[0m"  (* Trois joueurs *)
       | [p1; p2; p3; p4] ->
           if padding_size > 7 then
-            "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3 ^ "@" ^ p4  (* Affiche le 4ème joueur si padding > 7 *)
+            "\027[107m" ^ "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3 ^ "@" ^ p4 ^ "\027[0m"  (* Affiche le 4ème joueur si padding > 7 *)
           else if padding_size = 7 then
-            "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3 ^ "@"  (* Affiche le 4ème joueur si padding > 7 *)
+            "\027[107m" ^ "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3 ^ "@" ^ "\027[0m"  (* Affiche le 4ème joueur si padding > 7 *)
           else
-            "@" ^ p1 ^ "@" ^ p2 ^ p3 ^ p4  (* Sinon, seulement les 3 premiers joueurs *)
+            "\027[107m" ^ "@" ^ p1 ^ "@" ^ p2 ^ p3 ^ p4 ^ "\027[0m"  (* Sinon, seulement les 3 premiers joueurs *)
       | _ -> ""  (* Aucun joueur ou plus de 4 joueurs, cas non géré ici *)
     in
 
     (* Calculer le padding à appliquer pour que la longueur totale soit égale à padding_size *)
-    let total_length = String.length players_str in
+    let total_length = (String.length players_str) - 10 in
     if total_length >= padding_size then
       (* Si la chaîne de joueurs dépasse ou est égale à la taille désirée, on la renvoie telle quelle *)
       players_str
@@ -57,17 +57,17 @@ let infos_j (list_players: Player.player list) (is_jail : bool) : string =
   let cheaters, passersby = List.partition (fun p -> is_in_jail p) list_players in
   if is_jail then (* display des joueurs triche*)
     match List.map name_player cheaters with
-    | [p1] -> "@" ^ p1 ^ "    "
-    | [p1; p2] -> "@" ^ p1 ^ "@" ^ p2 ^ "  "
-    | [p1; p2; p3] -> "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3
-    | [p1; p2; p3; p4] -> "@" ^ p1 ^ "@" ^ p2 ^ p3 ^ p4
+    | [p1] -> "\027[107m" ^ "@" ^ p1  ^ "\027[0m" ^ "    "
+    | [p1; p2] -> "\027[107m" ^ "@" ^ p1 ^ "@" ^ p2  ^ "\027[0m" ^ "  "
+    | [p1; p2; p3] -> "\027[107m" ^ "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3 ^ "\027[0m"
+    | [p1; p2; p3; p4] -> "\027[107m" ^ "@" ^ p1 ^ "@" ^ p2 ^ p3 ^ p4 ^ "\027[0m"
     | _ -> "      "
   else (* display des passants jail*)
     match List.map name_player passersby with
-    | [p1] -> "@" ^ p1 ^ "______"
-    | [p1; p2] -> "@" ^ p1 ^ "@" ^ p2 ^ "____"
-    | [p1; p2; p3] -> "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3 ^ "__"
-    | [p1; p2; p3; p4] -> "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3 ^ "@" ^ p4
+    | [p1] -> "\027[107m" ^ "@" ^ p1  ^ "\027[0m" ^ "______"
+    | [p1; p2] -> "\027[107m" ^ "@" ^ p1 ^ "@" ^ p2  ^ "\027[0m" ^ "____"
+    | [p1; p2; p3] -> "\027[107m" ^ "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3  ^ "\027[0m" ^ "__"
+    | [p1; p2; p3; p4] -> "\027[107m" ^ "@" ^ p1 ^ "@" ^ p2 ^ "@" ^ p3 ^ "@" ^ p4 ^ "\027[0m"
     | _ -> "________"
 
 
@@ -119,17 +119,17 @@ let display (board : board) (players : player array) =
 
   (* Affichage du plateau *)
   print_endline "____________________________________________________________________________________";
-  print_endline "|Vacances |Géolog|      | Bio  |Chimie|Bibli |Optiqu| Elec |      | Meca |Suspicion|";
+  print_endline "|Vacances |Géolog| Vie  | Bio  |Chimie|Bibli |Optiqu| Elec |      | Meca |Suspicion|";
   print_endline ("|"^ (infos 20) ^"|"^ (infos 21) ^"|"^ (infos 22) ^"|"^ (infos 23) ^"|"^ (infos 24) ^"|"^ (infos 25) ^"|"^ (infos 26) ^"|"^ (infos 27) ^"|"^ (infos 28) ^"|"^ (infos 29) ^"|"^ (infos 30) ^"|");
-  print_endline "|         |______|      |______|______|      |______|______|      |______|De Triche|";
+  print_endline "|         |______|étudia|______|______|      |______|______|      |______|De Triche|";
   print_endline ("|_________|\027[42m*__"^ (prop 21)^"__\027[0m|______|\027[42m*__"^ (prop 23)^"__\027[0m|\027[42m*__"^ (prop 24)^"__\027[0m|__"^ (prop 25)^"___|\027[46m°__"^ (prop 26)^"__\027[0m|\027[46m°__"^ (prop 27)^"__\027[0m|__"^ (prop 28)^"___|\027[46m°__"^ (prop 29)^"__\027[0m|_________|");
-  print_endline "|Marketi|\027[103m$\027[0m|                                                              |\027[45m+\027[0m| Proba |";
+  print_endline ("|Marketi|\027[103m$\027[0m|                                                              |\027[45m+\027[0m| Proba |        C'est au tour de QQN" );
   print_endline ("|"^ (infos 19) ^"|\027[103m"^ (prop 19)^"\027[0m|                                                              |\027[45m"^ (prop 31)^"\027[0m|"^ (infos 31) ^"|");
   print_endline "|_______|\027[103m_\027[0m|                                                              |\027[45m_\027[0m|_______|";
   print_endline ("|Finance|\027[103m$\027[0m|                                                              |\027[45m+\027[0m|Analyse|                   " ^ name_player players.(0) ^ " a " ^ string_of_int (money_player players.(0)) ^ "€");
   print_endline ("|"^ (infos 18) ^"|\027[103m"^ (prop 18)^"\027[0m|                                                              |\027[45m"^ (prop 32)^"\027[0m|"^ (infos 32) ^"|");
   print_endline ("|_______|\027[103m_\027[0m|                                                              |\027[45m_\027[0m|_______|                   " ^ name_player players.(1) ^ " a " ^ string_of_int (money_player players.(1)) ^ "€");
-  print_endline "|         |                                                              |         |";
+  print_endline "|  Email  |                                                              |  Email  |";
   print_endline ("|"^ (infos 17) ^ "|                                                              |"^ (infos 33) ^"|                   " ^ name_player players.(2) ^ " a " ^ string_of_int (money_player players.(2)) ^ "€");
   print_endline "|_________|                                                              |_________|";
   print_endline ("| Socio |\027[103m$\027[0m|                                                              |\027[45m+\027[0m|Algèbre|                   " ^ name_player players.(3) ^ " a " ^ string_of_int (money_player players.(3)) ^ "€");
@@ -138,7 +138,7 @@ let display (board : board) (players : player array) =
   print_endline "|  Bibli  |                                                              |  Bibli  |";
   print_endline ("|"^ (infos 15) ^ (prop 15)^"|                                                              |"^ (prop 35) ^ (infos 35) ^"|");
   print_endline "|_________|                                                              |_________|";
-  print_endline "| Droit |\027[44m^\027[0m|                                                              |         |";
+  print_endline "| Droit |\027[44m^\027[0m|                                                              |Vie étudi|";
   print_endline ("|"^ (infos 14) ^"|\027[44m"^ (prop 14)^"\027[0m|                                                              |"^ (infos 36) ^"|");
   print_endline "|_______|\027[44m_\027[0m|                                                              |_________|";
   print_endline "|Géograp|\027[44m^\027[0m|                                                              |\027[100m#\027[0m| Algo  |";
@@ -150,8 +150,8 @@ let display (board : board) (players : player array) =
   print_endline "|Histoir|\027[44m^\027[0m|                                                              |\027[100m#\027[0m| OCaml |";
   print_endline ("|"^ (infos 11) ^"|\027[44m"^ (prop 11)^"\027[0m|                                                              |\027[100m"^ (prop 39)^"\027[0m|"^ (infos 39) ^"|");
   print_endline "|_______|\027[44m_\027[0m|______________________________________________________________|\027[100m_\027[0m|_______|";
-  print_endline ("|  |Triche|\027[102m%__"^ (prop 9)^"__\027[0m|\027[102m%__"^ (prop 8)^"__\027[0m|      |\027[102m%__"^ (prop 6)^"__\027[0m|  "^ (prop 5)^"   |Examen|\027[41m&__"^ (prop 3)^"__\027[0m|      |\027[41m&__"^ (prop 1)^"__\027[0m| Maison  |");
-  print_endline ("|  |"^ (infos_j 10) ^"|Anglai|Italie|      |Allema| BNF  |      |Philo |      |Litter|         |");
+  print_endline ("|  |Triche|\027[102m%__"^ (prop 9)^"__\027[0m|\027[102m%__"^ (prop 8)^"__\027[0m|  Vie |\027[102m%__"^ (prop 6)^"__\027[0m|  "^ (prop 5)^"   |Examen|\027[41m&__"^ (prop 3)^"__\027[0m|      |\027[41m&__"^ (prop 1)^"__\027[0m| Maison  |");
+  print_endline ("|  |"^ (infos_j 10) ^"|Anglai|Italie|étudia|Allema| BNF  |      |Philo |Email |Litter|         |");
   print_endline ("|  |______|"^ (infos 9) ^"|"^ (infos 8) ^"|"^ (infos 7) ^"|"^ (infos 6) ^"|"^ (infos 5) ^"|"^ (infos 4) ^"|"^ (infos 3) ^"|"^ (infos 2) ^"|"^ (infos 1) ^"|"^ (infos 0) ^"|");
   print_endline ("|_"^ (infos 10) ^"|______|______|______|______|______|______|______|______|______|_________|");;
 

@@ -5,13 +5,14 @@ type play =
   | Move of int
   | Buy of Square.square_buyable
   | PayJail
+  | PlayCard of Card.card
 
-type timeline = 
+type timeline =
   | Start
   | EndTurn
   | HandleSquare of Square.square
   | HandleJail
- 
+
 type outcome =
   | Next of game_state
   | Error of Error.error

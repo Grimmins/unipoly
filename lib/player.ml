@@ -4,16 +4,25 @@ type player = {
     money : int;
     in_jail : bool;
     turn_in_jail : int;
+    has_alibi :  bool;
 }
 
 (* créer un joueur, initial pos : 0, money : 0, sans propriétés *)
-let create_player name = { name; position = 0; money = 15000; in_jail = false; turn_in_jail = 0}
+let create_player name = { name; position = 0; money = 15000; in_jail = false; turn_in_jail = 0; has_alibi = false}
 
 (* return pos du joueur *)
 let pos_player player = player.position
 
 (* change pos du joueur *)
-let change_pos player new_pos = { player with position = new_pos }
+let change_pos player new_pos =
+    let adjusted_pos = (new_pos + 40) mod 40 in
+    { player with position = adjusted_pos }
+
+let receive_alibi_card (player: player) = { player with has_alibi = true}
+
+let use_alibi_card (player: player) = { player with has_alibi = false}
+
+let can_use_alibi (player: player) = player.has_alibi
 
 (* return nom joueur *)
 let name_player player = player.name

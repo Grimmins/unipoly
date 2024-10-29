@@ -14,6 +14,12 @@ val money_player : player -> int
 
 val change_money : player -> int -> player
 
+val receive_alibi_card : player -> player
+
+val use_alibi_card : player -> player
+
+val can_use_alibi : player -> bool
+
 val find_index_player : player -> player array -> int option
 
 val toogle_to_jail : player -> bool -> player
