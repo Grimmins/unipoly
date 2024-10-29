@@ -36,9 +36,9 @@ val price_buyable : square_buyable_type -> int
 
 val get_price : square -> int
 
-val get_owner : square_buyable -> Player.player option
+val get_owner : square_buyable -> Player.player array -> Player.player option
 
-val change_owner : square_buyable -> Player.player option -> square
+val change_owner : square_buyable -> int option -> square
 
 val name_square : square -> string
 
@@ -49,3 +49,4 @@ val create_tax : int -> string -> square
 val create_restaurant : string -> square
 
 val create_library : string -> square
+

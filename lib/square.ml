@@ -1,4 +1,3 @@
-open Player
 
   type ufr = Math | Info | Physique | SVT | Economie | Lettres | Langues | Hggsp
   type degre_type = Licence | Master | Doctorat
@@ -31,7 +30,7 @@ open Player
 
   type square_buyable = {
     type_square : square_buyable_type;
-    proprietaire : player option;
+    proprietaire_index : int option;
     }
 
 
@@ -45,12 +44,12 @@ open Player
   | HouseCheating
   | Tax of tax
 
-  let create_cours ufr price name = Buyable {type_square = Cours { ufr; price; degre = None; name }; proprietaire = None}
+  let create_cours ufr price name = Buyable {type_square = Cours { ufr; price; degre = None; name }; proprietaire_index = None}
 
   let create_buyable = function 
-    | Library l -> Buyable {type_square = Library l; proprietaire = None}
-    | Restaurant r -> Buyable {type_square = Restaurant r; proprietaire = None}
-    | Cours c -> Buyable {type_square = Cours c; proprietaire = None}
+    | Library l -> Buyable {type_square = Library l; proprietaire_index = None}
+    | Restaurant r -> Buyable {type_square = Restaurant r; proprietaire_index = None}
+    | Cours c -> Buyable {type_square = Cours c; proprietaire_index = None}
 
   let price_buyable = function
   | Cours c -> c.price
@@ -63,14 +62,16 @@ open Player
       price_buyable b.type_square
     | _ -> 0
 
-  let change_owner square_buyable player =
+  let change_owner square_buyable player_index =
     match square_buyable.type_square with
-    | Library l -> Buyable {type_square = Library l; proprietaire = player}
-    | Restaurant r -> Buyable {type_square = Restaurant r; proprietaire = player}
-    | Cours c -> Buyable {type_square = Cours c; proprietaire = player}
+    | Library l -> Buyable {type_square = Library l; proprietaire_index = player_index}
+    | Restaurant r -> Buyable {type_square = Restaurant r; proprietaire_index = player_index}
+    | Cours c -> Buyable {type_square = Cours c; proprietaire_index = player_index}
 
-  let get_owner square_buyable =
-    square_buyable.proprietaire
+  let get_owner square_buyable players =
+    square_buyable.proprietaire_index |> fun index ->
+      if index = None then None
+    else Some players.(Option.get index)
 
   let name_square = function
   | House -> "Maison"

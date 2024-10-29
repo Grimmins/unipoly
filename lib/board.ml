@@ -3,7 +3,7 @@ type board = Square.square array
 open Player
 open Square
 
-let get_prop (board : Square.square array) (k : int) =
+let get_prop (board : Square.square array) (k : int) players =
   let square = board.(k) in
   let char =
     match k with
@@ -12,7 +12,7 @@ let get_prop (board : Square.square array) (k : int) =
   in
   match square with
   | Buyable b -> (
-      match get_owner b with
+      match get_owner b players with
       | None -> char
       | Some p -> name_player p
     )
@@ -115,7 +115,7 @@ let get_infos (board : Square.square array) (players : Player.player array) (k :
 let display (board : board) (players : player array) =
   let infos k = get_infos board players k false in
     let infos_j k = get_infos board players k true in
-    let prop k = get_prop board k in
+    let prop k = get_prop board k players in
 
   (* Affichage du plateau *)
   print_endline "____________________________________________________________________________________";

@@ -54,7 +54,7 @@ let handle_index_player player game_state f  =
 
 (* paiement au propriétaire *)
 let pay_owner game_state player square_buyable = 
-  (match get_owner square_buyable with
+  (match get_owner square_buyable game_state.players with
     | Some owner -> 
       if money_player player < price_buyable (get_type_square square_buyable) then Error (NotEnoughMoney)
       else 
@@ -104,7 +104,7 @@ let rec act player play game_state =
 
         match Board.get_square (pos_player (get_current_player game_state)) game_state.board with 
 
-          | Buyable square -> (if get_owner square != None then pay_owner game_state player square 
+          | Buyable square -> (if get_owner square game_state.players != None then pay_owner game_state player square 
             else Next {game_state with timeline = HandleSquare (Board.get_square (pos_player player) game_state.board)})
 
           | Cheating -> (print_endline "Vous avez triché ! Vous êtes envoyé en prison !";
@@ -120,7 +120,7 @@ let rec act player play game_state =
       if price_buyable (get_type_square square_buyable) > money_player player then Error (NotEnoughMoney)
       else 
         change_money player (- price_buyable (get_type_square square_buyable)) |> fun player -> 
-        change_owner square_buyable (Some player) |> fun square -> 
+        change_owner square_buyable (Some (game_state.current_index_player)) |> fun square ->
               
             game_state.players.(game_state.current_index_player) <- player;
             Board.change_square (pos_player player) square game_state.board ;
@@ -186,7 +186,7 @@ let rec play (game_state : game_state) =
 
       | Square.Buyable square_buyable -> 
         
-        (match Square.get_owner square_buyable with
+        (match Square.get_owner square_buyable game_state.players with
           | None -> ( match (ask_buy square_buyable) with
               | true -> turn (Buy square_buyable) game_state
               | false -> endturn game_state)
