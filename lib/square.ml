@@ -85,3 +85,18 @@ open Player
   | Cheating -> "Cheating"
   | HouseCheating -> "HouseCheating"
   | Tax t -> t.name
+
+let get_type_square square_buyable =
+  square_buyable.type_square
+
+let create_tax price name = Tax {price; name}
+
+let create_library name = create_buyable (Library {name})
+
+let create_restaurant name = create_buyable (Restaurant {name})
+
+let _get_ufr c = c.ufr
+
+let _get_degre c = c.degre
+
+let _get_name c = c.name

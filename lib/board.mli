@@ -1,4 +1,4 @@
-type board = Square.square array
+type board
 
 (* fonction d'affichage *)
 val display :  board -> Player.player array -> unit
@@ -7,3 +7,7 @@ val display :  board -> Player.player array -> unit
 val init_board : unit-> board
 
 val index_square : Square.square -> Square.square array -> int option
+
+val get_square : int -> board -> Square.square
+
+val change_square : int -> Square.square -> board -> unit

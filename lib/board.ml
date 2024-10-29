@@ -12,7 +12,7 @@ let get_prop (board : Square.square array) (k : int) =
   in
   match square with
   | Buyable b -> (
-      match b.proprietaire with
+      match get_owner b with
       | None -> char
       | Some p -> name_player p
     )
@@ -161,18 +161,18 @@ let init_board () = [|
   Square.create_cours Lettres 60 "Littérature";
   Email;
   Square.create_cours Lettres 60 "Philosophie";
-  (Tax {price = 200; name = "Examens"});
-  create_buyable (Library {name = "Bibliothèque"});
+  create_tax 200 "Examens";
+  create_library "Bibliothèque";
   Square.create_cours Langues 100 "Allemand";
   StLife;
   Square.create_cours Langues 100 "Italien";
   Square.create_cours Langues 120 "Anglais";
   HouseCheating;
   Square.create_cours Hggsp 140 "Histoire";
-  create_buyable (Restaurant {name = "Crous"});
+  create_restaurant "Crous";
   Square.create_cours Hggsp 140 "Géographie";
   Square.create_cours Hggsp 160 "Droit";
-  create_buyable (Library {name = "Bibliothèque"});
+  create_library "Bibliothèque";
   Square.create_cours Economie 180 "Sociologie";
   Email;
   Square.create_cours Economie 180 "Finances";
@@ -182,20 +182,20 @@ let init_board () = [|
   StLife;
   Square.create_cours SVT 220 "Biologie";
   Square.create_cours SVT 240 "Chimie";
-  create_buyable (Library {name = "Bibliothèque"});
+  create_library "Bibliothèque";
   Square.create_cours Physique 260 "Optique";
   Square.create_cours Physique 260 "Electronique";
-  create_buyable (Restaurant {name = "Barge"});
+  create_restaurant "Barge";
   Square.create_cours Physique 280 "Mécanique";
   Cheating;
   Square.create_cours Math 300 "Probabilités";
   Square.create_cours Math 300 "Analyse";
   Email;
   Square.create_cours Math 320 "Algèbre";
-  create_buyable (Library {name = "Bibliothèque"});
+  create_library "Bibliothèque";
   StLife;
   Square.create_cours Info 350 "Algorithmie";
-  (Tax {price = 100; name = "Frais de scolarité"});
+  create_tax 100 "Frais de scolarité";
   Square.create_cours Info 400 "OCaml";
   |]
 
@@ -207,3 +207,10 @@ let index_square (square : Square.square) board =
       else if board.(i) == square then Some i
       else loop (i + 1) in
     loop 0
+
+(* return the square from index k in board *)
+let get_square (k : int) board =
+  board.(k)
+
+let change_square (k : int) (square : Square.square) board =
+  board.(k) <- square;

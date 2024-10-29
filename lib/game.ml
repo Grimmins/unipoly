@@ -56,13 +56,13 @@ let handle_index_player player game_state f  =
 let pay_owner game_state player square_buyable = 
   (match get_owner square_buyable with
     | Some owner -> 
-      if money_player player < price_buyable square_buyable.type_square then Error (NotEnoughMoney)
+      if money_player player < price_buyable (get_type_square square_buyable) then Error (NotEnoughMoney)
       else 
-        change_money player (- (price_buyable square_buyable.type_square)) |> fun player -> 
-        change_money owner (price_buyable square_buyable.type_square) |> fun owner -> 
+        change_money player (- (price_buyable (get_type_square square_buyable))) |> fun player -> 
+        change_money owner (price_buyable (get_type_square square_buyable)) |> fun owner -> 
           update_current_player game_state player;
         game_state.players.(find_index_player owner game_state.players |> Option.get) <- owner;
-        print_endline (name_player player ^ " a payé " ^ name_player owner ^ " " ^ string_of_int (price_buyable square_buyable.type_square) ^ "€");
+        print_endline (name_player player ^ " a payé " ^ name_player owner ^ " " ^ string_of_int (price_buyable (get_type_square square_buyable)) ^ "€");
         Next {game_state with timeline = EndTurn}
     | None -> Error (NoOwner))
 
@@ -102,30 +102,30 @@ let rec act player play game_state =
         game_state.players.(index) <- player; 
         display game_state.board game_state.players;
 
-        match game_state.board.(pos_player (get_current_player game_state)) with 
+        match Board.get_square (pos_player (get_current_player game_state)) game_state.board with 
 
-          | Buyable square -> (if square.proprietaire != None then pay_owner game_state player square 
-            else Next {game_state with timeline = HandleSquare game_state.board.(pos_player player)})
+          | Buyable square -> (if get_owner square != None then pay_owner game_state player square 
+            else Next {game_state with timeline = HandleSquare (Board.get_square (pos_player player) game_state.board)})
 
           | Cheating -> (print_endline "Vous avez triché ! Vous êtes envoyé en prison !";
           update_current_player game_state (Player.toogle_to_jail (get_current_player game_state) true);
           goto game_state (get_current_player game_state) 10;)
             
 
-          | _ ->  Next {game_state with timeline = HandleSquare game_state.board.(pos_player player)}
+          | _ ->  Next {game_state with timeline = HandleSquare (Board.get_square (pos_player player) game_state.board)}
             )
 
   (* achat d'une propriété *)
    | Buy square_buyable -> 
-      if price_buyable square_buyable.type_square > money_player player then Error (NotEnoughMoney)
+      if price_buyable (get_type_square square_buyable) > money_player player then Error (NotEnoughMoney)
       else 
-        change_money player (- price_buyable square_buyable.type_square) |> fun player -> 
+        change_money player (- price_buyable (get_type_square square_buyable)) |> fun player -> 
         change_owner square_buyable (Some player) |> fun square -> 
               
             game_state.players.(game_state.current_index_player) <- player;
-            game_state.board.(pos_player player) <- square;
+            Board.change_square (pos_player player) square game_state.board ;
             (* TODO : pas dans la même fonction*)
-            print_endline (name_player player ^ " a acheté " ^ string_of_int (price_buyable square_buyable.type_square) ^ "€ " ^ name_square square);
+            print_endline (name_player player ^ " a acheté " ^ string_of_int (price_buyable (get_type_square square_buyable)) ^ "€ " ^ name_square square);
             Next {game_state with timeline = EndTurn}
 
   | PayJail -> (
@@ -146,7 +146,7 @@ let create_game board players =
 
 (* demande d'achat d'une propriété *)
 let ask_buy square_buyable =
-  (print_endline ("Voulez-vous acheter " ^ name_square (Buyable (square_buyable)) ^ " pour " ^ string_of_int (price_buyable square_buyable.type_square) ^ "€ ? (y/n)");
+  (print_endline ("Voulez-vous acheter " ^ name_square (Buyable (square_buyable)) ^ " pour " ^ string_of_int (price_buyable (get_type_square square_buyable)) ^ "€ ? (y/n)");
   let rec ask_buy () = 
     match read_line () with
     | "y" -> true
