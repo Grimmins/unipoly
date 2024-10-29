@@ -2,12 +2,15 @@ open Player
 open Board
 open Error
 open Square
+open Card
+open Deck
 
 type play = 
   | Roll
   | Move of int
   | Buy of square_buyable
   | PayJail
+  | PlayCard of card
 
 type timeline  =
   | Start
@@ -104,6 +107,19 @@ let rec act player play game_state =
 
         match Board.get_square (pos_player (get_current_player game_state)) game_state.board with
 
+          | Email -> let (card, _) = Deck.draw_card (init_email_deck ()) in
+          print_endline ("Vous recevez un email de l'administration : ");
+          print_endline (Card.get_name card);
+          print_endline (Card.get_description card);
+          act player (PlayCard card) game_state
+
+          | StLife -> let (card, _) = Deck.draw_card (init_stlife_deck ()) in
+          print_endline ("Vous recevez un message de l'association Vie étudiante : ");
+          print_endline (Card.get_name card);
+          print_endline (Card.get_description card);
+          act player (PlayCard card) game_state
+
+
           | Buyable square -> (if get_owner square game_state.players != None then pay_owner game_state player square
             else Next {game_state with timeline = HandleSquare (Board.get_square (pos_player player) game_state.board)})
 
@@ -134,6 +150,11 @@ let rec act player play game_state =
     else (change_money player (- 500) |> fun player ->
       update_current_player game_state (toogle_to_jail player false);
       Next {game_state with timeline = Start}))
+
+  | PlayCard card ->
+  let updated_player = Card.apply_card_effect player card in
+  update_current_player game_state updated_player;
+  Next {game_state with timeline = EndTurn}
 
 
 let create_game board players = 
@@ -196,15 +217,28 @@ let rec play (game_state : game_state) =
 
       | _ -> endturn game_state)
 
-    | HandleJail -> let rec ask_jail () = (print_endline "";
+    | HandleJail -> let rec ask_jail () = (
+        print_endline "";
         print_endline "Vous êtes en prison. Vous avez 3 tours pour sortir. Vous pouvez payer 500€ pour sortir immédiatement.";
         print_endline ("Vous avez actuellement " ^ string_of_int (Player.get_turn_jail (get_current_player game_state)) ^ " tours en prison.");
-        print_endline "Voulez-vous payer pour sortir de prison ? (y/n) ";
+        let has_alibi = can_use_alibi (get_current_player game_state) in
+        if has_alibi then
+                    print_endline "Vous pouvez également utiliser votre carte Alibi pour sortir de prison.";
+        print_endline
+                    (if has_alibi
+                     then "Voulez-vous payer pour sortir de prison ? (y/n/a) \n(a = utiliser la carte Alibi)"
+                     else "Voulez-vous payer pour sortir de prison ? (y/n) ");
         match read_line () with
           | "y" -> turn (PayJail) game_state
           | "n" -> (
 
             endturn game_state)
+          | "a" when has_alibi ->
+                let player = get_current_player game_state in
+                let updated_player = Player.use_alibi_card player in
+                update_current_player game_state (Player.toogle_to_jail updated_player false);
+                print_endline "Vous avez utilisé votre carte Alibi pour sortir de prison.";
+                turn Roll game_state
           | _ -> ask_jail ())
         in ask_jail ()
     | EndTurn -> endturn game_state)

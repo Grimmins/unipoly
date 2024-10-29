@@ -27,10 +27,11 @@ let get_effect card = card.effect
 let apply_card_effect (player: player) (card: card) : player =
     match card.effect with
       | Move n -> change_pos player (pos_player player + n)
-      | GainMoney amount -> change_money player (money_player player + amount)
-      | LoseMoney amount -> change_money player (money_player player - amount)
+      | GainMoney amount | LoseMoney amount -> change_money player amount
       | GoTo position -> change_pos player position
-      | GoToJail -> toogle_to_jail player true;
+      | GoToJail ->
+        let player_pos_jailed = change_pos player 10 in
+        toogle_to_jail player_pos_jailed true;
       | GetOutOfJail -> receive_alibi_card player;
      (* | SkipTurn -> { player with skip_turn = true }  on add possibilité de skip turn ? *)
     (*  | GetOutOfJail -> receive_alibi_card player  Le joueur reçoit une carte spéciale *)

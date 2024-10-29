@@ -5,6 +5,7 @@ type play =
   | Move of int
   | Buy of Square.square_buyable
   | PayJail
+  | PlayCard of Card.card
 
 type timeline =
   | Start

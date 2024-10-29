@@ -14,7 +14,9 @@ let create_player name = { name; position = 0; money = 15000; in_jail = false; t
 let pos_player player = player.position
 
 (* change pos du joueur *)
-let change_pos player new_pos = { player with position = new_pos }
+let change_pos player new_pos =
+    let adjusted_pos = (new_pos + 40) mod 40 in
+    { player with position = adjusted_pos }
 
 let receive_alibi_card (player: player) = { player with has_alibi = true}
 
