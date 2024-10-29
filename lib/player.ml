@@ -1,6 +1,6 @@
 type player = {
     name : string;
-    position : int; (* En programmation fonctionnel pas de mutable !! *)
+    position : int; (* En programmation fonctionnelle pas de mutable !! *)
     money : int;
     in_jail : bool;
     turn_in_jail : int;

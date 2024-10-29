@@ -1,4 +1,3 @@
-
 type ufr = Math | Info | Physique | SVT | Economie | Lettres | Langues | Hggsp
 type degre_type = Licence | Master | Doctorat
 type degre = degre_type option
@@ -49,4 +48,3 @@ val create_tax : int -> string -> square
 val create_restaurant : string -> square
 
 val create_library : string -> square
-
