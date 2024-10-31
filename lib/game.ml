@@ -216,10 +216,28 @@ let rec play (game_state : game_state) =
 
   (* Handle the turn *)
   let rec turn play game_state  =
+  if Player.is_eliminated (get_current_player game_state) then
+    (print_endline (name_player (get_current_player game_state) ^ " a été éliminé.");
+    endturn game_state)
+  else
   (act (get_current_player game_state) play game_state |> function outcome -> match outcome with
 
-  (* TODO :  Error handling *)
-  | Error _error -> print_endline "Erreur";
+  | Error error -> (
+      match error with
+        | NotEnoughMoney -> (print_endline "Vous n'avez pas assez d'argent pour effectuer cette action. Vous avez perdu.";
+          (* TODO : Enlever toutes les propriétés du joueur *)
+           Player.eliminate_player (get_current_player game_state) |> fun player -> (
+            update_current_player game_state player;
+            endturn game_state)
+                 ) 
+
+        | InvalidPlayer -> print_endline "Erreur : joueur introuvable. arrêt du jeu.";
+        | NoOwner -> print_endline "Erreur : propriétaire introuvable. arrêt du jeu.";
+        | InvalidBoard -> print_endline "Erreur : plateau corrompu. arrêt du jeu.";
+        | InvalidMove -> print_endline "Erreur : mouvement invalide. arrêt du jeu.";
+        | InvalidSquare -> print_endline "Erreur : case invalide. arrêt du jeu.";
+
+  )
 
   (* Next turn *)
   | Next game_state -> match get_timeline game_state with
@@ -233,8 +251,7 @@ let rec play (game_state : game_state) =
               | true -> turn (Buy square_buyable) game_state
               | false -> endturn game_state)
 
-          (* TODO :  Error handling *)
-          | Some _owner -> print_endline "Erreur")
+          | Some _owner -> print_endline "Erreur : propriétaire déjà existant. arrêt du jeu.";)
 
       | _ -> endturn game_state)
 

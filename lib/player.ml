@@ -5,10 +5,11 @@ type player = {
     in_jail : bool;
     turn_in_jail : int;
     has_alibi :  bool;
+    is_eliminated : bool;
 }
 
 (* créer un joueur, initial pos : 0, money : 0, sans propriétés *)
-let create_player name = { name; position = 0; money = 1500; in_jail = false; turn_in_jail = 0; has_alibi = false}
+let create_player name = { name; position = 0; money = 1500; in_jail = false; turn_in_jail = 0; has_alibi = false; is_eliminated = false}
 
 (* return pos du joueur *)
 let pos_player player = player.position
@@ -49,3 +50,7 @@ let toogle_to_jail player b = {player with in_jail = b}
 let add_turn_jail player = {player with turn_in_jail = player.turn_in_jail + 1}
 
 let get_turn_jail player = player.turn_in_jail
+
+let eliminate_player player = {player with is_eliminated = true}
+
+let is_eliminated player = player.is_eliminated

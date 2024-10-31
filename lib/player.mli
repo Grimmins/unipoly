@@ -27,3 +27,7 @@ val toogle_to_jail : player -> bool -> player
 val add_turn_jail : player -> player
 
 val get_turn_jail : player -> int
+
+val eliminate_player : player -> player
+
+val is_eliminated : player -> bool
