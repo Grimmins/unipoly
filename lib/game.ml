@@ -4,6 +4,7 @@ open Error
 open Square
 open Card
 open Deck
+open Property
 
 type play = 
   | Roll
@@ -47,7 +48,7 @@ let roll_dices () =
   print_endline "";
   print_endline ("Résultat des dés : " ^ string_of_int d1 ^ " , " ^ string_of_int d2);
   if d1 = d2 then print_endline "Double !";
-  (d1, d2)
+  (4, 4)
 
 (* Handle the int option when finding the index of player *)
 let handle_index_player player game_state f  = 
@@ -57,17 +58,45 @@ let handle_index_player player game_state f  =
 
 (* paiement au propriétaire *)
 let pay_owner game_state player square_buyable =
-  (match get_owner square_buyable game_state.players with
-    | Some owner ->
-      if money_player player < price_buyable (get_type_square square_buyable) then Error (NotEnoughMoney)
-      else
-        change_money player (- (price_buyable (get_type_square square_buyable))) |> fun player ->
-        change_money owner (price_buyable (get_type_square square_buyable)) |> fun owner ->
-          update_current_player game_state player;
-        game_state.players.(find_index_player owner game_state.players |> Option.get) <- owner;
-        print_endline (name_player player ^ " a payé " ^ name_player owner ^ " " ^ string_of_int (price_buyable (get_type_square square_buyable)) ^ "€");
-        Next {game_state with timeline = EndTurn}
-    | None -> Error (NoOwner))
+  match get_owner square_buyable game_state.players with
+  | Some owner when owner != player ->  (* Si le propriétaire n'est pas le joueur lui-même *)
+      (match find_index_player owner game_state.players with
+      | Some owner_index ->
+          let amount_to_pay =
+            match get_type_square square_buyable with
+            | Restaurant _ ->
+                let (d1, d2) = roll_dices () in
+                let multiplier =
+                  if count_restaurants_owned owner_index game_state.board >= 2 then 10 else 4
+                in
+                let fee = (d1 + d2) * multiplier in
+                print_endline ("Vous payez " ^ string_of_int fee ^ "€ de consommation.");
+                fee
+            | Library _ ->
+                let fee =
+                  match count_librairies_owned owner_index game_state.board with
+                  | 1 -> 25
+                  | 2 -> 50
+                  | 3 -> 100
+                  | 4 -> 200
+                  | _ -> 0
+                in
+                print_endline ("Vous louez une salle pour " ^ string_of_int fee ^ "€.");
+                fee
+            | _ -> price_buyable (get_type_square square_buyable)
+          in
+          if money_player player < amount_to_pay then Error (NotEnoughMoney)
+          else
+            let player = change_money player (-amount_to_pay) in
+            let owner = change_money owner amount_to_pay in
+            update_current_player game_state player;
+            game_state.players.(Option.get (find_index_player owner game_state.players)) <- owner;
+            print_endline (name_player player ^ " a payé " ^ string_of_int amount_to_pay ^ "€ à " ^ name_player owner);
+            Next { game_state with timeline = EndTurn }
+      | None -> Error (InvalidPlayer))
+  | _ ->  (* Aucun propriétaire ou le propriétaire est le joueur lui-même *)
+      Next { game_state with timeline = EndTurn }
+
 
 let rec act player play game_state = 
   let goto game_state player i =
@@ -141,8 +170,24 @@ let rec act player play game_state =
           act player (PlayCard card) game_state
 
 
-          | Buyable square -> (if get_owner square game_state.players != None then pay_owner game_state player square
-            else Next {game_state with timeline = HandleSquare (Board.get_square (pos_player player) game_state.board)})
+          | Buyable square ->
+            (match get_type_square square with
+              | Restaurant r ->
+              let name_restaurant = get_name_restaurant r in
+                   if name_restaurant = "Barge" then
+                     print_endline "Vous arrivez à la Barge (si elle appartient déjà à quelqu'un, vous dépensez en fonction de votre chance aux dés)"
+                   else if name_restaurant = "Crous" then
+                     print_endline "Vous arrivez au Crous (s'il appartient déjà à quelqu'un, vous dépensez en fonction de votre chance aux dés)"
+                   else
+                     print_endline ("Vous arrivez au " ^ name_restaurant ^ "(vous dépensez en fonction de votre chance aux dés)");
+                     (if get_owner square game_state.players != None then pay_owner game_state player square
+                     else Next {game_state with timeline = HandleSquare (Board.get_square (pos_player player) game_state.board)})
+              | Library _ ->
+                   print_endline "Vous arrivez à une Bibliothèque Universitaire.";
+                   (if get_owner square game_state.players != None then pay_owner game_state player square
+                   else Next {game_state with timeline = HandleSquare (Board.get_square (pos_player player) game_state.board)})
+              | _ -> (if get_owner square game_state.players != None then pay_owner game_state player square
+                else Next {game_state with timeline = HandleSquare (Board.get_square (pos_player player) game_state.board)}))
 
           | Cheating -> (print_endline "Vous avez triché ! Vous êtes envoyé en prison !";
           update_current_player game_state (Player.toogle_to_jail (get_current_player game_state) true);

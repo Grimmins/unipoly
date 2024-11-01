@@ -1,4 +1,3 @@
-
   type ufr = Math | Info | Physique | SVT | Economie | Lettres | Langues | Hggsp
   type degre_type = Licence | Master | Doctorat
   type degre = degre_type option
@@ -95,6 +94,8 @@ let create_tax price name = Tax {price; name}
 let create_library name = create_buyable (Library {name})
 
 let create_restaurant name = create_buyable (Restaurant {name})
+
+let get_name_restaurant (r : restaurant) = r.name
 
 let _get_ufr c = c.ufr
 
