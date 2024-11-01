@@ -48,7 +48,7 @@ let roll_dices () =
   print_endline "";
   print_endline ("Résultat des dés : " ^ string_of_int d1 ^ " , " ^ string_of_int d2);
   if d1 = d2 then print_endline "Double !";
-  (4, 4)
+  (d1, d2)
 
 (* Handle the int option when finding the index of player *)
 let handle_index_player player game_state f  = 
@@ -193,7 +193,15 @@ let rec act player play game_state =
           update_current_player game_state (Player.toogle_to_jail (get_current_player game_state) true);
           goto game_state (get_current_player game_state) 10;)
 
-
+          | Tax tax_square ->
+            let tax_amount = get_tax_amount (Tax tax_square) in
+            if money_player player < tax_amount then
+                Error (NotEnoughMoney)
+            else
+                let update_player = change_money player (-tax_amount) in
+                update_current_player game_state update_player;
+                print_endline (name_player player ^ " a payé une taxe de " ^ string_of_int tax_amount ^ "€.");
+                Next { game_state with timeline = EndTurn }
           | _ ->  Next {game_state with timeline = HandleSquare (Board.get_square (pos_player player) game_state.board)}
             )
 
