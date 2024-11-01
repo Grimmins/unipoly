@@ -44,6 +44,8 @@ val change_owner : square_buyable -> int option -> square
 
 val name_square : square -> string
 
+val get_tax_amount : square -> int
+
 val get_type_square : square_buyable -> square_buyable_type
 
 val get_name_restaurant : restaurant -> string

@@ -61,6 +61,10 @@
       price_buyable b.type_square
     | _ -> 0
 
+  let get_tax_amount = function
+    | Tax t -> t.price
+    | _ -> 0
+
   let change_owner square_buyable player_index =
     match square_buyable.type_square with
     | Library l -> Buyable {type_square = Library l; proprietaire_index = player_index}
