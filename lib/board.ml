@@ -119,7 +119,7 @@ let display (board : board) (players : player array) =
 
   (* Affichage du plateau *)
   print_endline "____________________________________________________________________________________";
-  print_endline "|Vacances |Géolog| Vie  | Bio  |Chimie|Bibli |Optiqu| Elec |      | Meca |Suspicion|";
+  print_endline "|Vacances |Géolog| Vie  | Bio  |Chimie|St-Gen|Optiqu| Elec |Barge | Meca |Suspicion|";
   print_endline ("|"^ (infos 20) ^"|"^ (infos 21) ^"|"^ (infos 22) ^"|"^ (infos 23) ^"|"^ (infos 24) ^"|"^ (infos 25) ^"|"^ (infos 26) ^"|"^ (infos 27) ^"|"^ (infos 28) ^"|"^ (infos 29) ^"|"^ (infos 30) ^"|");
   print_endline "|         |______|étudia|______|______|      |______|______|      |______|De Triche|";
   print_endline ("|_________|\027[42m*__"^ (prop 21)^"__\027[0m|______|\027[42m*__"^ (prop 23)^"__\027[0m|\027[42m*__"^ (prop 24)^"__\027[0m|__"^ (prop 25)^"___|\027[46m°__"^ (prop 26)^"__\027[0m|\027[46m°__"^ (prop 27)^"__\027[0m|__"^ (prop 28)^"___|\027[46m°__"^ (prop 29)^"__\027[0m|_________|");
@@ -135,7 +135,7 @@ let display (board : board) (players : player array) =
   print_endline ("| Socio |\027[103m$\027[0m|                                                              |\027[45m+\027[0m|Algèbre|                   " ^ name_player players.(3) ^ " a " ^ string_of_int (money_player players.(3)) ^ "€");
   print_endline ("|"^ (infos 16) ^"|\027[103m"^ (prop 16)^"\027[0m|                                                              |\027[45m"^ (prop 34)^"\027[0m|"^ (infos 34) ^"|");
   print_endline "|_______|\027[103m_\027[0m|                                                              |\027[45m_\027[0m|_______|";
-  print_endline "|  Bibli  |                                                              |  Bibli  |";
+  print_endline "| Tolbiac |                                                              |   BPI   |";
   print_endline ("|"^ (infos 15) ^ (prop 15)^"|                                                              |"^ (prop 35) ^ (infos 35) ^"|");
   print_endline "|_________|                                                              |_________|";
   print_endline "| Droit |\027[44m^\027[0m|                                                              |Vie étudi|";
@@ -144,7 +144,7 @@ let display (board : board) (players : player array) =
   print_endline "|Géograp|\027[44m^\027[0m|                                                              |\027[100m#\027[0m| Algo  |";
   print_endline ("|"^ (infos 13) ^"|\027[44m"^ (prop 13)^"\027[0m|                                                              |\027[100m"^ (prop 37)^"\027[0m|"^ (infos 37) ^"|");
   print_endline "|_______|\027[44m_\027[0m|                                                              |\027[100m_\027[0m|_______|";
-  print_endline "|         |                                                              |         |";
+  print_endline "|  Crous  |                                                              |         |";
   print_endline ("|"^ (infos 12) ^ (prop 12)^"|                                                              |"^ (infos 38) ^"|");
   print_endline "|_________|                                                              |_________|";
   print_endline "|Histoir|\027[44m^\027[0m|                                                              |\027[100m#\027[0m| OCaml |";

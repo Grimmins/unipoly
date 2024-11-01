@@ -15,7 +15,10 @@ type square_buyable_type =
 | Library of library
 | Restaurant of restaurant
 
-type square_buyable
+type square_buyable = {
+    type_square : square_buyable_type;
+    proprietaire_index : int option;
+    }
 
 type square =
 House
@@ -42,6 +45,8 @@ val change_owner : square_buyable -> int option -> square
 val name_square : square -> string
 
 val get_type_square : square_buyable -> square_buyable_type
+
+val get_name_restaurant : restaurant -> string
 
 val create_tax : int -> string -> square
 

@@ -1,4 +1,3 @@
-open Board
 open Square
 
 let count_properties_owned property_type player_index board =
@@ -7,7 +6,6 @@ let count_properties_owned property_type player_index board =
     | Buyable { type_square = ts; proprietaire_index = Some index } when index = player_index && property_type ts -> count + 1
     | _ -> count
   ) 0 board
-
 
 let is_restaurant = function
   | Restaurant _ -> true
@@ -29,5 +27,3 @@ let count_librairies_owned player_index board =
 
 let count_cours_owned player_index board =
     count_properties_owned is_cours player_index board
-
-let get_name_restaurant r = r.name

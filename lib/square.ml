@@ -95,6 +95,8 @@ let create_library name = create_buyable (Library {name})
 
 let create_restaurant name = create_buyable (Restaurant {name})
 
+let get_name_restaurant (r : restaurant) = r.name
+
 let _get_ufr c = c.ufr
 
 let _get_degre c = c.degre
