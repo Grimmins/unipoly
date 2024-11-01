@@ -5,6 +5,11 @@
   type cours = {
   ufr : ufr;
   price : int;
+  landing_price: int;
+  licence_price: int;
+  master_price: int;
+  doctorat_price: int;
+  upgrade_price: int;
   degre : degre;
   name : string;
   }
@@ -43,7 +48,7 @@
   | HouseCheating
   | Tax of tax
 
-  let create_cours ufr price name = Buyable {type_square = Cours { ufr; price; degre = None; name }; proprietaire_index = None}
+  let create_cours ufr price name landing_price licence_price master_price doctorat_price upgrade_price = Buyable {type_square = Cours { ufr; price; landing_price; licence_price; master_price; doctorat_price; upgrade_price; degre = None; name }; proprietaire_index = None}
 
   let create_buyable = function 
     | Library l -> Buyable {type_square = Library l; proprietaire_index = None}
@@ -101,8 +106,18 @@ let create_restaurant name = create_buyable (Restaurant {name})
 
 let get_name_restaurant (r : restaurant) = r.name
 
-let _get_ufr c = c.ufr
+let get_ufr (c : cours) = c.ufr
 
-let _get_degre c = c.degre
+let get_degre (c : cours) = c.degre
 
-let _get_name c = c.name
+let get_name_cours (c : cours) = c.name
+
+let get_landing_price (c : cours) = c.landing_price
+
+let get_licence_price (c : cours) = c.licence_price
+
+let get_master_price (c : cours) = c.master_price
+
+let get_doctorat_price (c : cours) = c.doctorat_price
+
+let get_upgrade_price (c : cours) = c.upgrade_price

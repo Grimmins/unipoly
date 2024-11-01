@@ -12,6 +12,7 @@ type play =
   | Buy of square_buyable
   | PayJail
   | PlayCard of card
+  | BuyDiploma of Square.cours
 
 type timeline  =
   | Start
@@ -64,6 +65,8 @@ let pay_owner game_state player square_buyable =
       | Some owner_index ->
           let amount_to_pay =
             match get_type_square square_buyable with
+            | Cours cours ->
+                get_adjusted_course_landing_price cours owner_index game_state.board
             | Restaurant _ ->
                 let (d1, d2) = roll_dices () in
                 let multiplier =
@@ -83,7 +86,6 @@ let pay_owner game_state player square_buyable =
                 in
                 print_endline ("Vous louez une salle pour " ^ string_of_int fee ^ "€.");
                 fee
-            | _ -> price_buyable (get_type_square square_buyable)
           in
           if money_player player < amount_to_pay then Error (NotEnoughMoney)
           else
@@ -230,6 +232,23 @@ let rec act player play game_state =
   update_current_player game_state updated_player;
   Next {game_state with timeline = EndTurn}
 
+  | BuyDiploma cours ->
+      let player = get_current_player game_state in
+      let player_index = game_state.current_index_player in
+      if owns_all_courses_in_ufr (get_ufr cours) player_index game_state.board then
+        let diploma_price = get_upgrade_price cours
+        in
+        if money_player player < diploma_price then Error (NotEnoughMoney)
+        else
+          let player = change_money player (-diploma_price) in
+          update_current_player game_state player;
+          print_endline (name_player player ^ " a acheté un diplôme pour " ^ (get_name_cours cours));
+          Next { game_state with timeline = EndTurn }
+      else
+        Error (InvalidAction)
+
+
+
 
 let create_game board players = 
   { board;
@@ -248,25 +267,38 @@ let ask_buy square_buyable =
     | "n" -> false
     | _ -> print_endline "Veuillez entrer y ou n"; ask_buy () in ask_buy ())
 
+(* demande uograde propriété *)
+let ask_for_diploma_purchase game_state endturn =
+  let player = get_current_player game_state in
+  let player_index = game_state.current_index_player in
+  let courses = get_courses_owned_by_player player_index game_state.board in
+  let eligible_courses = List.filter (fun cours -> owns_all_courses_in_ufr (get_ufr cours) player_index game_state.board) courses in
+
+  List.iter (fun cours ->
+    print_endline ("Voulez-vous améliorer " ^ (get_name_cours cours) ^ " ? Prix : " ^ string_of_int (get_next_degree_price cours));
+    match read_line () with
+    | "y" -> ignore (act player (BuyDiploma cours) game_state)
+    | _ -> ()
+  ) eligible_courses;
+
+  endturn game_state
+
 (** [play game_state] is the main function of the game. It displays the board, handles the turn and the end of the turn.
     @param game_state the current state of the game
     @return unit
 *)
+
 let rec play (game_state : game_state) =
-
-  (* End the turn *)
-  let endturn game_state =
-    (print_endline "";
-      print_endline "Appuyez sur Entrée pour terminer votre tour, ou tapez 'end' pour terminer le jeu : ";
-      match read_line () with
-        | "end" -> exit 0
-        | _ -> match has_to_replay game_state with
-          | true -> play game_state
-          | false -> play (end_turn game_state))
-      in
-
-  (Board.display game_state.board game_state.players game_state.current_index_player;
-
+    (* End the turn *)
+      let endturn game_state =
+        (print_endline "";
+          print_endline "Appuyez sur Entrée pour terminer votre tour, ou tapez 'end' pour terminer le jeu : ";
+          match read_line () with
+            | "end" -> exit 0
+            | _ -> match has_to_replay game_state with
+              | true -> play game_state
+              | false -> play (end_turn game_state))
+   in
   (* Handle the turn *)
   let rec turn play game_state  =
   if Player.is_eliminated (get_current_player game_state) then
@@ -289,6 +321,7 @@ let rec play (game_state : game_state) =
         | InvalidBoard -> print_endline "Erreur : plateau corrompu. arrêt du jeu.";
         | InvalidMove -> print_endline "Erreur : mouvement invalide. arrêt du jeu.";
         | InvalidSquare -> print_endline "Erreur : case invalide. arrêt du jeu.";
+        | InvalidAction -> print_endline "Erruer : aciton impossible. arrêt du jeu.";
 
   )
 
@@ -332,7 +365,5 @@ let rec play (game_state : game_state) =
                 turn Roll game_state
           | _ -> ask_jail ())
         in ask_jail ()
-    | EndTurn -> endturn game_state)
-
-
-      in turn Roll game_state)
+    | EndTurn -> ask_for_diploma_purchase game_state endturn)
+      in turn Roll game_state

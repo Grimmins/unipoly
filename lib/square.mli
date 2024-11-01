@@ -30,7 +30,7 @@ House
 | HouseCheating
 | Tax of tax
 
-val create_cours : ufr -> int -> string -> square
+val create_cours : ufr -> int -> string -> int -> int -> int -> int -> int -> square
 
 val create_buyable : square_buyable_type -> square
 
@@ -55,3 +55,21 @@ val create_tax : int -> string -> square
 val create_restaurant : string -> square
 
 val create_library : string -> square
+
+val get_ufr : cours -> ufr
+
+val get_degre : cours -> degre
+
+val get_name_cours : cours -> string
+
+val get_landing_price : cours -> int
+
+val get_licence_price : cours -> int
+
+val get_master_price : cours -> int
+
+val get_doctorat_price : cours -> int
+
+val get_upgrade_price : cours -> int
+
+

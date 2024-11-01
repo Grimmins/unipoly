@@ -6,6 +6,7 @@ type play =
   | Buy of Square.square_buyable
   | PayJail
   | PlayCard of Card.card
+  | BuyDiploma of Square.cours
 
 type timeline =
   | Start

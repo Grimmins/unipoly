@@ -18,7 +18,6 @@ let get_prop (board : Square.square array) (k : int) players =
     )
   | _ -> char
 
-
 let get_players (list_players : player list) (padding_size : int) : string =
     (* Récupérer la liste des noms des joueurs *)
     let name_list = List.map (fun (p : player) -> name_player p) list_players in
@@ -158,45 +157,45 @@ let display (board : board) (players : player array) current_index_player =
 
 let init_board () = [|
   House;
-  Square.create_cours Lettres 60 "Littérature";
+  Square.create_cours Lettres 60 "Littérature" 2 10 90 250 50;
   Email;
-  Square.create_cours Lettres 60 "Philosophie";
+  Square.create_cours Lettres 60 "Philosophie" 4 20 180 450 50;
   create_tax 200 "Examens";
   create_library "Bibliothèque";
-  Square.create_cours Langues 100 "Allemand";
+  Square.create_cours Langues 100 "Allemand" 6 30 270 550 50;
   StLife;
-  Square.create_cours Langues 100 "Italien";
-  Square.create_cours Langues 120 "Anglais";
+  Square.create_cours Langues 100 "Italien" 6 30 270 550 50;
+  Square.create_cours Langues 120 "Anglais" 8 40 300 600 50;
   HouseCheating;
-  Square.create_cours Hggsp 140 "Histoire";
+  Square.create_cours Hggsp 140 "Histoire" 10 50 450 750 100;
   create_restaurant "Crous";
-  Square.create_cours Hggsp 140 "Géographie";
-  Square.create_cours Hggsp 160 "Droit";
+  Square.create_cours Hggsp 140 "Géographie" 10 50 450 750 100;
+  Square.create_cours Hggsp 160 "Droit" 12 60 500 900 100;
   create_library "Bibliothèque";
-  Square.create_cours Economie 180 "Sociologie";
+  Square.create_cours Economie 180 "Sociologie" 14 70 550 950 100;
   Email;
-  Square.create_cours Economie 180 "Finances";
-  Square.create_cours Economie 200 "Marketing";
+  Square.create_cours Economie 180 "Finances" 14 70 550 950 100;
+  Square.create_cours Economie 200 "Marketing" 16 80 600 1000 100;
   Holiday;
-  Square.create_cours SVT 220 "Géologie";
+  Square.create_cours SVT 220 "Géologie" 18 90 700 1050 150;
   StLife;
-  Square.create_cours SVT 220 "Biologie";
-  Square.create_cours SVT 240 "Chimie";
+  Square.create_cours SVT 220 "Biologie" 18 90 700 1050 150;
+  Square.create_cours SVT 240 "Chimie" 20 100 750 1100 150;
   create_library "Bibliothèque";
-  Square.create_cours Physique 260 "Optique";
-  Square.create_cours Physique 260 "Electronique";
+  Square.create_cours Physique 260 "Optique" 22 110 800 1150 150;
+  Square.create_cours Physique 260 "Electronique" 22 110 800 1150 150;
   create_restaurant "Barge";
-  Square.create_cours Physique 280 "Mécanique";
+  Square.create_cours Physique 280 "Mécanique" 24 120 850 1200 150;
   Cheating;
-  Square.create_cours Math 300 "Probabilités";
-  Square.create_cours Math 300 "Analyse";
+  Square.create_cours Math 300 "Probabilités" 26 130 900 1275 200;
+  Square.create_cours Math 300 "Analyse" 26 130 900 1275 200;
   Email;
-  Square.create_cours Math 320 "Algèbre";
+  Square.create_cours Math 320 "Algèbre" 28 150 1000 1400 200;
   create_library "Bibliothèque";
   StLife;
-  Square.create_cours Info 350 "Algorithmie";
+  Square.create_cours Info 350 "Algorithmie" 35 175 1100 1500 200;
   create_tax 100 "Frais de scolarité";
-  Square.create_cours Info 400 "OCaml";
+  Square.create_cours Info 400 "OCaml" 50 200 1400 2000 200;
   |]
 
 
