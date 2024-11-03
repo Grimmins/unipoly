@@ -6,7 +6,7 @@ val count_cours_owned : int -> Board.board -> int
 
 val owns_all_courses_in_ufr : Square.ufr -> int -> Board.board -> bool
 
-val get_courses_owned_by_player : int -> Board.board -> Square.cours list
+val get_courses_owned_by_player : int -> Board.board -> Square.square list
 
 val get_landing_price : Square.cours -> int
 

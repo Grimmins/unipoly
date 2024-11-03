@@ -40,8 +40,8 @@ let owns_all_courses_in_ufr ufr player_index board =
 let get_courses_owned_by_player player_index board =
   Array.fold_left (fun acc square ->
     match square with
-    | Buyable { type_square = Cours cours; proprietaire_index = Some index; _ } when index = player_index ->
-        cours :: acc
+    | Buyable { type_square = Cours _cours; proprietaire_index = Some index; _ } when index = player_index ->
+        square :: acc
     | _ -> acc
   ) [] board
 

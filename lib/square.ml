@@ -135,3 +135,19 @@ let get_master_price (c : cours) = c.master_price
 let get_doctorat_price (c : cours) = c.doctorat_price
 
 let get_upgrade_price (c : cours) = c.upgrade_price
+
+let get_square_buyable = function
+  | Buyable b -> Some b
+  | _ -> None
+
+let get_cours = function
+  | {type_square = Cours c; _} -> Some c
+  | _ -> None
+
+let get_index_from_square (square : square) (board : square array) = 
+  let rec aux i = function
+    | [] -> None
+    | h::t -> if h == square then Some i else aux (i+1) t
+  in aux 0 (Array.to_list board)
+
+let get_cours_from_square square = (Option.get (get_cours (Option.get (get_square_buyable square)))) 

@@ -46,6 +46,10 @@ val name_square : square -> string
 
 val get_tax_amount : square -> int
 
+val get_square_buyable : square -> square_buyable option
+
+val get_cours : square_buyable -> cours option
+
 val get_type_square : square_buyable -> square_buyable_type
 
 val get_name_restaurant : restaurant -> string
@@ -74,4 +78,6 @@ val get_upgrade_price : cours -> int
 
 val update_degre : square_buyable -> square_buyable
 
+val get_cours_from_square : square -> cours
 
+val get_index_from_square : square -> square array -> int option
