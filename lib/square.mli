@@ -72,4 +72,6 @@ val get_doctorat_price : cours -> int
 
 val get_upgrade_price : cours -> int
 
+val update_degre : square_buyable -> square_buyable
+
 

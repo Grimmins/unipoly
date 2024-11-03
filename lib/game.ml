@@ -49,7 +49,7 @@ let roll_dices () =
   print_endline "";
   print_endline ("Résultat des dés : " ^ string_of_int d1 ^ " , " ^ string_of_int d2);
   if d1 = d2 then print_endline "Double !";
-  (d1, d2)
+  (1, 0)
 
 (* Handle the int option when finding the index of player *)
 let handle_index_player player game_state f  = 
@@ -240,12 +240,22 @@ let rec act player play game_state =
         in
         if money_player player < diploma_price then Error (NotEnoughMoney)
         else
-          let player = change_money player (-diploma_price) in
-          update_current_player game_state player;
-          print_endline (name_player player ^ " a acheté un diplôme pour " ^ (get_name_cours cours));
-          Next { game_state with timeline = EndTurn }
-      else
-        Error (InvalidAction)
+          (* Récupérer la position et la case *)
+         let pos = pos_player player in
+                 match Board.get_square pos game_state.board with
+                 | Buyable square_buyable ->
+                     (match get_type_square square_buyable with
+                     | Cours existing_cours when (get_name_cours existing_cours) = (get_name_cours cours) ->
+                         let updated_square_buyable = update_degre square_buyable in
+                         let player = change_money player (-diploma_price) in
+                         update_current_player game_state player;
+                         Board.change_square pos (Buyable updated_square_buyable) game_state.board;
+                         print_endline (name_player player ^ " a acheté un diplôme pour " ^ (get_name_cours existing_cours));
+                         Next { game_state with timeline = EndTurn }
+                     | _ -> Error InvalidAction)
+                 | _ -> Error InvalidSquare
+             else
+               Error InvalidAction
 
 
 
@@ -281,7 +291,7 @@ let ask_for_diploma_purchase game_state endturn =
     | _ -> ()
   ) eligible_courses;
 
-  endturn game_state
+    endturn game_state
 
 (** [play game_state] is the main function of the game. It displays the board, handles the turn and the end of the turn.
     @param game_state the current state of the game

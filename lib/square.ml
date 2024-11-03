@@ -37,6 +37,20 @@
     proprietaire_index : int option;
     }
 
+let next_degre = function
+  | None -> Some Licence
+  | Some Licence -> Some Master
+  | Some Master -> Some Doctorat
+  | Some Doctorat -> Some Doctorat
+
+let update_degre square_buyable =
+  match square_buyable.type_square with
+  | Cours cours ->
+      let new_degre = next_degre cours.degre in
+      let updated_cours = { cours with degre = new_degre } in
+      { square_buyable with type_square = Cours updated_cours }
+  | _ -> square_buyable
+
 
   type square =
    House
@@ -50,7 +64,7 @@
 
   let create_cours ufr price name landing_price licence_price master_price doctorat_price upgrade_price = Buyable {type_square = Cours { ufr; price; landing_price; licence_price; master_price; doctorat_price; upgrade_price; degre = None; name }; proprietaire_index = None}
 
-  let create_buyable = function 
+  let create_buyable = function
     | Library l -> Buyable {type_square = Library l; proprietaire_index = None}
     | Restaurant r -> Buyable {type_square = Restaurant r; proprietaire_index = None}
     | Cours c -> Buyable {type_square = Cours c; proprietaire_index = None}
@@ -62,7 +76,7 @@
 
   let get_price = function
     | Tax c -> c.price
-    | Buyable b -> 
+    | Buyable b ->
       price_buyable b.type_square
     | _ -> 0
 
@@ -85,7 +99,7 @@
   | House -> "Maison"
   | Email -> "Email"
   | StLife -> "StLife"
-  | Buyable b -> 
+  | Buyable b ->
     (match b.type_square with
     | Cours c -> c.name
     | Library l -> l.name
