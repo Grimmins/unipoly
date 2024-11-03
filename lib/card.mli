@@ -19,5 +19,5 @@ val get_description : card -> string
 
 val get_effect : card -> action
 
-val apply_card_effect : player -> card -> player
+val apply_card_effect : player -> card -> player * bool
 

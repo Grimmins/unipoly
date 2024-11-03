@@ -7,6 +7,7 @@ type play =
   | PayJail
   | PlayCard of Card.card
   | BuyDiploma of Square.square list
+  | Change of Square.square_buyable * Square.square_buyable
 
 type timeline =
   | Start
@@ -14,6 +15,7 @@ type timeline =
   | HandleSquare of Square.square
   | HandleJail
   | AskDiploma
+  | AskChange
 
 type outcome =
   | Next of game_state

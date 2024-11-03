@@ -45,6 +45,14 @@ let get_courses_owned_by_player player_index board =
     | _ -> acc
   ) [] board
 
+let get_properties_owned_by_player player_index board : square_buyable list =
+  Array.fold_left (fun acc square ->
+    match square with
+    | Buyable { proprietaire_index = Some index; _ } when index = player_index ->
+        Option.get (get_square_buyable square) :: acc
+    | _ -> acc
+  ) [] board
+
 let get_landing_price cours =
   match (get_degre cours) with
   | None -> get_landing_price cours

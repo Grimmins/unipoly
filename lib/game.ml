@@ -13,6 +13,7 @@ type play =
   | PayJail
   | PlayCard of card
   | BuyDiploma of square list
+  | Change of square_buyable * square_buyable
 
 type timeline  =
   | Start
@@ -20,6 +21,7 @@ type timeline  =
   | HandleSquare of square
   | HandleJail
   | AskDiploma
+  | AskChange
 
 type game_state = {
   board : Board.board;
@@ -56,7 +58,7 @@ let roll_dices () =
   print_endline "";
   print_endline ("Résultat des dés : " ^ string_of_int d1 ^ " , " ^ string_of_int d2);
   if d1 = d2 then print_endline "Double !";
-  (d1, d2)
+  (2, 0)
 
 (* Handle the int option when finding the index of player *)
 let handle_index_player player game_state f  = 
@@ -234,10 +236,24 @@ let rec act player play game_state =
       update_current_player game_state (toogle_to_jail player false);
       Next {game_state with timeline = Start}))
 
+  | Change (square1, square2) -> (
+    let player_index = square1.proprietaire_index in
+    let player_index2 = square2.proprietaire_index in
+
+    let index_square = get_index_from_square_buyable square1 game_state.board in
+    let index_square2 = get_index_from_square_buyable square2 game_state.board in
+    game_state.board.(Option.get index_square) <- change_owner square1 player_index2;
+    game_state.board.(Option.get index_square2) <- change_owner square2 player_index;
+
+    Next {game_state with timeline = EndTurn}
+    )
+
   | PlayCard card ->
-  let updated_player = Card.apply_card_effect player card in
-  update_current_player game_state updated_player;
-  Next {game_state with timeline = AskDiploma}
+  (let updated_player = Card.apply_card_effect player card in
+  update_current_player game_state (fst updated_player);
+    match snd updated_player with
+    | false -> Next {game_state with timeline = AskDiploma}
+    | true -> act (get_current_player game_state) (Move 0) game_state)
 
   | BuyDiploma list_square ->
       let player = get_current_player game_state in
@@ -289,6 +305,74 @@ let ask_buy square_buyable =
     | "n" -> false
     | _ -> print_endline "Veuillez entrer y ou n"; ask_buy () in ask_buy ())
 
+(** [ask_change game_state play] asks the player if he wants to change a property with another player.
+  @param game_state the current state of the game
+  @param play the action function
+  @return unit
+*)
+let ask_change game_state endturn turn  =
+  print_endline "";
+  print_endline "Voulez-vous échanger une propriété avec un autre joueur ? Tapez 'y' pour échanger ou taper entrer pour passer :";
+  match read_line () with
+    | "y" -> (
+      let properties_owned = get_properties_owned_by_player game_state.current_index_player game_state.board in
+      if List.length properties_owned = 0 then
+        (print_endline "Vous n'avez pas de propriété à échanger.";
+        endturn game_state)
+      else
+      print_endline "Voici les joueurs :";
+      Array.iteri (fun i player -> print_endline (string_of_int i ^ " : " ^ name_player player)) game_state.players;
+      print_endline "Entrez le numéro du joueur avec lequel vous souhaitez échanger ou taper enter pour passer :";
+
+      match read_line () with
+      | "" -> endturn game_state
+      | s -> let index = int_of_string_opt s in
+        match index with
+        | None -> (print_endline "Numéro de joueur invalide. Fin de l'échange.";
+          endturn game_state)
+        | Some index ->
+        if index >= 0 && index < Array.length game_state.players && index != game_state.current_index_player then
+          (let properties = get_properties_owned_by_player index game_state.board in
+          if List.length properties = 0 then
+            (print_endline "Ce joueur n'a pas de propriété à échanger.";
+            endturn game_state)
+
+          else 
+            (print_endline "Voici les propriétés de ce joueur :";
+            List.iter (fun square -> print_endline (string_of_int (Option.get (find_index (fun s -> s = square) properties)) ^ " : " ^ name_square (create_buyable (get_type_square square)))) properties;
+            print_endline "";
+            print_endline "Entrez le numéro de la propriété que vous souhaitez échanger ou taper enter pour passer :";
+
+            match read_line () with
+            | "" -> endturn game_state
+            | s -> let index = int_of_string s in
+
+              if index >= 0 && index < List.length properties then
+                (print_endline "Voici vos propriétés :";
+                
+                 List.iter (fun square -> print_endline (string_of_int (Option.get (find_index (fun s -> s = square) properties_owned)) ^ " : " ^ name_square (create_buyable (get_type_square square)))) properties_owned;
+                 print_endline "";
+                 (print_endline "Entrez le numéro de la propriété que vous souhaitez donner en échange ou taper enter pour annuler l'échange :";
+                match read_line () with
+                | "" -> endturn game_state
+                | s -> let index_player = int_of_string s in
+                  if index_player >= 0 && index_player < List.length properties_owned then
+                    (turn (Change (List.nth properties index, List.nth properties_owned index_player)) game_state)
+                  else
+                    (print_endline "Numéro de propriété invalide. Fin de l'échange.";
+                    endturn game_state)))
+              else
+                (print_endline "Numéro de propriété invalide. Fin de l'échange.";
+
+                endturn game_state)))
+              else 
+                (print_endline "Numéro de joueur invalide. Fin de l'échange.";
+                endturn game_state)
+            )
+          
+    | _ -> endturn game_state
+
+
 (* demande uograde propriété *)
 let ask_for_diploma_purchase game_state endturn turn =
 
@@ -297,44 +381,47 @@ let ask_for_diploma_purchase game_state endturn turn =
   let eligible_courses = List.filter (fun square -> owns_all_courses_in_ufr (get_ufr (get_cours_from_square square)) player_index game_state.board) courses in
 
   if List.length eligible_courses = 0 then
-    endturn game_state
+    ask_change game_state endturn turn
   else 
     (print_endline "Vous avez la possibilité d'acheter un diplôme pour une de vos matières :";
     List.iter (fun square -> print_endline (string_of_int (Option.get (find_index (fun c -> (get_cours_from_square c) = (get_cours_from_square square)) eligible_courses)) ^ " : " ^ get_name_cours (get_cours_from_square square))) eligible_courses;
     print_endline "Entrez le(s) numéro(s) de la matière pour lequels vous souhaitez acheter un diplôme ou taper enter pour passer :";
     match read_line () with
-    | "" -> endturn game_state
+    | "" -> ask_change game_state endturn turn
     | s -> let indices = String.split_on_char ' ' s in
       let indices = List.map (fun s -> int_of_string s) indices in
       let indices = List.filter (fun i -> i >= 0 && i < List.length eligible_courses) indices in
       let courses_to_buy = List.map (fun i -> List.nth eligible_courses i) indices in
       turn (BuyDiploma courses_to_buy) game_state)
-    
-    
 
 
 (** [play game_state] is the main function of the game. It displays the board, handles the turn and the end of the turn.
     @param game_state the current state of the game
     @return unit
 *)
-
 let rec play (game_state : game_state) =
-    (* End the turn *)
+
+      (* End the turn *)
       let endturn game_state =
         (print_endline "";
-          print_endline "Appuyez sur Entrée pour terminer votre tour, ou tapez 'end' pour terminer le jeu : ";
+          print_endline "Appuyez sur Entrée pour terminer votre tour ou tapez 'end' pour terminer le jeu : ";
           match read_line () with
             | "end" -> exit 0
             | _ -> match has_to_replay game_state with
               | true -> play game_state
               | false -> play (end_turn game_state))
-   in
+    in
+
   (* Handle the turn *)
   let rec turn play game_state  =
+
   if Player.is_eliminated (get_current_player game_state) then
     (print_endline (name_player (get_current_player game_state) ^ " a été éliminé.");
     endturn game_state)
   else
+
+
+    
   (act (get_current_player game_state) play game_state |> function outcome -> match outcome with
 
   | Error error -> (
@@ -396,5 +483,6 @@ let rec play (game_state : game_state) =
           | _ -> ask_jail ())
         in ask_jail ()
     | AskDiploma -> ask_for_diploma_purchase game_state endturn turn
+    | AskChange -> ask_change game_state endturn turn
     | EndTurn -> endturn game_state)
       in turn Roll game_state

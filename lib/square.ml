@@ -150,4 +150,12 @@ let get_index_from_square (square : square) (board : square array) =
     | h::t -> if h == square then Some i else aux (i+1) t
   in aux 0 (Array.to_list board)
 
+let get_index_from_square_buyable (square_buyable : square_buyable) (board : square array) = 
+  let rec aux i = function
+    | [] -> None
+    | h::t -> match h with
+      | Buyable b when b == square_buyable -> Some i
+      | _ -> aux (i+1) t
+  in aux 0 (Array.to_list board)
+
 let get_cours_from_square square = (Option.get (get_cours (Option.get (get_square_buyable square)))) 
