@@ -34,6 +34,12 @@ type game_state = {
   | Error of error
 (*| | Endgame of player option*)
 
+let find_index p =
+  let rec aux i = function
+    [] -> None
+    | a::l -> if p a then Some i else aux (i+1) l in
+  aux 0
+
 let get_current_player game_state = game_state.players.(game_state.current_index_player)
 
 let update_current_player game_state player = game_state.players.(game_state.current_index_player) <- player
@@ -294,7 +300,7 @@ let ask_for_diploma_purchase game_state endturn turn =
     endturn game_state
   else 
     (print_endline "Vous avez la possibilité d'acheter un diplôme pour une de vos matières :";
-    List.iter (fun square -> print_endline (string_of_int (Option.get (List.find_index (fun c -> (get_cours_from_square c) = (get_cours_from_square square)) eligible_courses)) ^ " : " ^ get_name_cours (get_cours_from_square square))) eligible_courses;
+    List.iter (fun square -> print_endline (string_of_int (Option.get (find_index (fun c -> (get_cours_from_square c) = (get_cours_from_square square)) eligible_courses)) ^ " : " ^ get_name_cours (get_cours_from_square square))) eligible_courses;
     print_endline "Entrez le(s) numéro(s) de la matière pour lequels vous souhaitez acheter un diplôme ou taper enter pour passer :";
     match read_line () with
     | "" -> endturn game_state
