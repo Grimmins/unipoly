@@ -24,14 +24,14 @@ let get_name card = card.name
 let get_description card = card.description
 let get_effect card = card.effect
 
-let apply_card_effect (player: player) (card: card) : player =
+let apply_card_effect (player: player) (card: card)  =
     match card.effect with
-      | Move n -> change_pos player (pos_player player + n)
-      | GainMoney amount | LoseMoney amount -> change_money player amount
-      | GoTo position -> change_pos player position
+      | Move n -> (change_pos player (pos_player player + n)), true
+      | GainMoney amount | LoseMoney amount -> change_money player amount, false
+      | GoTo position -> change_pos player position, true
       | GoToJail ->
         let player_pos_jailed = change_pos player 10 in
-        toogle_to_jail player_pos_jailed true;
-      | GetOutOfJail -> receive_alibi_card player;
+        (toogle_to_jail player_pos_jailed true), false;
+      | GetOutOfJail -> (receive_alibi_card player), false;
      (* | SkipTurn -> { player with skip_turn = true }  on add possibilité de skip turn ? *)
     (*  | GetOutOfJail -> receive_alibi_card player  Le joueur reçoit une carte spéciale *)

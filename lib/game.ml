@@ -58,7 +58,7 @@ let roll_dices () =
   print_endline "";
   print_endline ("Résultat des dés : " ^ string_of_int d1 ^ " , " ^ string_of_int d2);
   if d1 = d2 then print_endline "Double !";
-  (d1, d2)
+  (2, 0)
 
 (* Handle the int option when finding the index of player *)
 let handle_index_player player game_state f  = 
@@ -249,9 +249,11 @@ let rec act player play game_state =
     )
 
   | PlayCard card ->
-  let updated_player = Card.apply_card_effect player card in
-  update_current_player game_state updated_player;
-  Next {game_state with timeline = AskDiploma}
+  (let updated_player = Card.apply_card_effect player card in
+  update_current_player game_state (fst updated_player);
+    match snd updated_player with
+    | false -> Next {game_state with timeline = AskDiploma}
+    | true -> act (get_current_player game_state) (Move 0) game_state)
 
   | BuyDiploma list_square ->
       let player = get_current_player game_state in
@@ -324,7 +326,11 @@ let ask_change game_state endturn turn  =
 
       match read_line () with
       | "" -> endturn game_state
-      | s -> let index = int_of_string s in
+      | s -> let index = int_of_string_opt s in
+        match index with
+        | None -> (print_endline "Numéro de joueur invalide. Fin de l'échange.";
+          endturn game_state)
+        | Some index ->
         if index >= 0 && index < Array.length game_state.players && index != game_state.current_index_player then
           (let properties = get_properties_owned_by_player index game_state.board in
           if List.length properties = 0 then
