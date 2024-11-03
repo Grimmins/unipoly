@@ -29,4 +29,4 @@ Les joueurs peuvent aussi piocher des cartes email de l'administration ou Vie é
 # Lorsqu'un joueur n'a plus d'argent, il est éliminé du jeu.
 # Le jeu se termine quand il ne reste plus qu'un joueur en jeu. Ce joueur est alors déclaré vainqueur.
 
-Les règles du jeu sont les mêmes que celles du monopoly, sans les hypothèques -> Un joueur n'ayant pas l'argent pour payer perd directement.
+Les règles du jeu sont les mêmes que celles du monopoly, sans les enchères et les hypothèques -> Un joueur n'ayant pas l'argent pour payer perd directement.
