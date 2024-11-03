@@ -26,7 +26,7 @@ build:
         opam switch create --yes --deps-only --with-test --with-doc . 4.13.0
       fi
     - eval $(opam env)
-    - opam install alcotest
+    - opam install alcotest -y
     - dune build
 
 test:
