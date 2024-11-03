@@ -6,6 +6,18 @@
   (name test_property)
   (libraries alcotest unipoly))
 
-;(test
-;  (name test_square)
-;  (libraries alcotest unipoly))
+(test
+  (name test_square)
+  (libraries alcotest unipoly))
+
+(test
+  (name test_deck)
+  (libraries alcotest unipoly))
+
+(test
+  (name test_card)
+  (libraries alcotest unipoly))
+
+(test
+  (name test_game)
+  (libraries alcotest unipoly))
