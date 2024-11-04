@@ -71,3 +71,11 @@ let get_next_degree_price cours =
     match (get_degre cours) with
         | Some Doctorat -> 0
         | _ -> get_upgrade_price cours
+
+let remove_all_properties player_index board =
+  Array.iteri (fun i square ->
+    match square with
+    | Buyable square_buyable when square_buyable.proprietaire_index = Some player_index ->
+        board.(i) <- Buyable { square_buyable with proprietaire_index = None }
+    | _ -> ()
+  ) board

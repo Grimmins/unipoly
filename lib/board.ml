@@ -1,9 +1,9 @@
-
-type board = Square.square array
 open Player
 open Square
 
-let get_prop (board : Square.square array) (k : int) players =
+type board = square array
+
+let get_prop (board : board) (k : int) players =
   let square = board.(k) in
   let char =
     match k with
@@ -72,8 +72,9 @@ let infos_j (list_players: Player.player list) (is_jail : bool) : string =
 
 
 (* return infos for kth square in board *)
-let get_infos (board : Square.square array) (players : Player.player array) (k : int) (is_jail : bool) : string =
-   let list_players = List.filter (fun p -> (pos_player p) = k ) (Array.to_list players) in
+let get_infos (board : board) (players : Player.player array) (k : int) (is_jail : bool) : string =
+   let players_not_eliminated = List.filter (fun p -> not (is_eliminated p)) (Array.to_list players) in
+   let list_players = List.filter (fun p -> (pos_player p) = k ) players_not_eliminated in
    let nb_players = List.length list_players in
     if k = 10 then
         infos_j list_players is_jail
@@ -94,7 +95,12 @@ let get_infos (board : Square.square array) (players : Player.player array) (k :
          if List.mem k [0; 2; 7; 17; 20; 22; 30; 33; 36] then
            "  "  (* Afficher "  " pour les cases spécifiques *)
          else
-           string_of_int (get_price board.(k)) ^ "k"  (* Afficher le prix sinon *)
+            let owner = Option.get (get_owner (Option.get (get_square_buyable board.(k))) players) in
+            let owner_index = Option.get (find_index_player owner players) in
+            let num_libraries_owned = Property.count_librairies_owned owner_index board in
+            let owns_all_courses = Property.owns_all_courses_in_ufr (get_ufr (get_cours_from_square board.(k))) owner_index board in
+            let price = get_price num_libraries_owned owns_all_courses board.(k) in
+           string_of_int price ^ "k"  (* Afficher le prix sinon *)
      | _ -> get_players list_players padding_size  (* Afficher les joueurs s'il y en a *)
    in
 (* Calculer le padding pour centrer le texte, tout en vérifiant que le padding n'est pas négatif *)
@@ -120,12 +126,19 @@ let get_degre_char (k : int) (board : board) : string =
     )
   | _ -> " "
 
+let display_player_status player =
+  if is_eliminated player then
+    name_player player ^ " est éliminé"
+  else
+    name_player player ^ " a " ^ string_of_int (money_player player) ^ "€"
+
 
 let display (board : board) (players : player array) current_index_player =
   let infos k = get_infos board players k false in
     let infos_j k = get_infos board players k true in
     let prop k = get_prop board k players in
     let deg k = get_degre_char k board in
+    let stat i = display_player_status players.(i) in
 
   (* Affichage du plateau *)
   print_endline "____________________________________________________________________________________";
@@ -136,13 +149,13 @@ let display (board : board) (players : player array) current_index_player =
   print_endline ("|Marketi|\027[103m$\027[0m|                                                              |\027[45m+\027[0m| Proba |        C'est au tour de " ^ name_player (players.(current_index_player)));
   print_endline ("|"^ (infos 19) ^"|\027[103m"^ (prop 19)^"\027[0m|                                                              |\027[45m"^ (prop 31)^"\027[0m|"^ (infos 31) ^"|");
   print_endline ("|_______|\027[103m"^ (deg 19) ^"\027[0m|                                                              |\027[45m"^ (deg 31) ^"\027[0m|_______|");
-  print_endline ("|Finance|\027[103m$\027[0m|                                                              |\027[45m+\027[0m|Analyse|                   " ^ name_player players.(0) ^ " a " ^ string_of_int (money_player players.(0)) ^ "€");
+  print_endline ("|Finance|\027[103m$\027[0m|                                                              |\027[45m+\027[0m|Analyse|                   " ^ stat 0);
   print_endline ("|"^ (infos 18) ^"|\027[103m"^ (prop 18)^"\027[0m|                                                              |\027[45m"^ (prop 32)^"\027[0m|"^ (infos 32) ^"|");
-  print_endline ("|_______|\027[103m"^ (deg 18) ^"\027[0m|                                                              |\027[45m"^ (deg 32) ^"\027[0m|_______|                   " ^ name_player players.(1) ^ " a " ^ string_of_int (money_player players.(1)) ^ "€");
+  print_endline ("|_______|\027[103m"^ (deg 18) ^"\027[0m|                                                              |\027[45m"^ (deg 32) ^"\027[0m|_______|                   " ^ stat 1);
   print_endline "|  Email  |                                                              |  Email  |";
-  print_endline ("|"^ (infos 17) ^ "|                                                              |"^ (infos 33) ^"|                   " ^ name_player players.(2) ^ " a " ^ string_of_int (money_player players.(2)) ^ "€");
+  print_endline ("|"^ (infos 17) ^ "|                                                              |"^ (infos 33) ^"|                   " ^ stat 2);
   print_endline "|_________|                                                              |_________|";
-  print_endline ("| Socio |\027[103m$\027[0m|                                                              |\027[45m+\027[0m|Algèbre|                   " ^ name_player players.(3) ^ " a " ^ string_of_int (money_player players.(3)) ^ "€");
+  print_endline ("| Socio |\027[103m$\027[0m|                                                              |\027[45m+\027[0m|Algèbre|                   " ^ stat 3);
   print_endline ("|"^ (infos 16) ^"|\027[103m"^ (prop 16)^"\027[0m|                                                              |\027[45m"^ (prop 34)^"\027[0m|"^ (infos 34) ^"|");
   print_endline ("|_______|\027[103m"^ (deg 16) ^"\027[0m|                                                              |\027[45m"^ (deg 34) ^"\027[0m|_______|");
   print_endline "| Tolbiac |                                                              |   BPI   |";
@@ -223,4 +236,22 @@ let get_square (k : int) board =
   board.(k)
 
 let change_square (k : int) (square : Square.square) board =
-  board.(k) <- square;
+  board.(k) <- square
+
+let get_adjusted_course_landing_price_board cours owner_index board  = Property.get_adjusted_course_landing_price cours owner_index board
+
+let count_restaurants_owned_board owner_index board = Property.count_restaurants_owned owner_index board
+
+let count_librairies_owned_board owner_index board = Property.count_librairies_owned owner_index board
+
+let get_index_from_square_buyable_board square board = Square.get_index_from_square_buyable square board
+
+let owns_all_courses_in_ufr_board ufr player_index board = Property.owns_all_courses_in_ufr ufr player_index board
+
+let get_index_from_square_board square board = Square.get_index_from_square square board
+
+let get_properties_owned_by_player_board player_index board = Property.get_properties_owned_by_player player_index board
+
+let get_courses_owned_by_player_board player_index board = Property.get_courses_owned_by_player player_index board
+
+let remove_all_properties_board player_index board = Property.remove_all_properties player_index board

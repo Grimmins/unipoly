@@ -4,7 +4,6 @@ open Error
 open Square
 open Card
 open Deck
-open Property
 
 type play = 
   | Roll
@@ -75,18 +74,19 @@ let pay_owner game_state player square_buyable =
           let amount_to_pay =
             match get_type_square square_buyable with
             | Cours cours ->
-                get_adjusted_course_landing_price cours owner_index game_state.board
+                get_adjusted_course_landing_price_board cours owner_index game_state.board
+
             | Restaurant _ ->
                 let (d1, d2) = roll_dices () in
                 let multiplier =
-                  if count_restaurants_owned owner_index game_state.board >= 2 then 10 else 4
+                  if count_restaurants_owned_board owner_index game_state.board >= 2 then 10 else 4
                 in
                 let fee = (d1 + d2) * multiplier in
                 print_endline ("Vous payez " ^ string_of_int fee ^ "€ de consommation.");
                 fee
             | Library _ ->
                 let fee =
-                  match count_librairies_owned owner_index game_state.board with
+                  match count_librairies_owned_board owner_index game_state.board with
                   | 1 -> 25
                   | 2 -> 50
                   | 3 -> 100
@@ -230,7 +230,6 @@ let rec act player play game_state =
             Next {game_state with timeline = AskDiploma}
 
   | PayJail -> (
-    (* TODO : Change 500 with constant *)
     if money_player player < 500 then Error (NotEnoughMoney)
     else (change_money player (- 500) |> fun player ->
       update_current_player game_state (toogle_to_jail player false);
@@ -240,10 +239,10 @@ let rec act player play game_state =
     let player_index = square1.proprietaire_index in
     let player_index2 = square2.proprietaire_index in
 
-    let index_square = get_index_from_square_buyable square1 game_state.board in
-    let index_square2 = get_index_from_square_buyable square2 game_state.board in
-    game_state.board.(Option.get index_square) <- change_owner square1 player_index2;
-    game_state.board.(Option.get index_square2) <- change_owner square2 player_index;
+    let index_square = get_index_from_square_buyable_board square1 game_state.board in
+    let index_square2 = get_index_from_square_buyable_board square2 game_state.board in
+    change_square (Option.get index_square) (change_owner square1 player_index2) game_state.board;
+    change_square (Option.get index_square2) (change_owner square2 player_index) game_state.board;
 
     Next {game_state with timeline = EndTurn}
     )
@@ -262,7 +261,7 @@ let rec act player play game_state =
       
       let rec buy_diploma list_square = match list_square with
       | [] -> Next {game_state with timeline = EndTurn}
-      | square :: list -> if owns_all_courses_in_ufr (get_ufr (get_cours_from_square square)) player_index game_state.board then
+      | square :: list -> if owns_all_courses_in_ufr_board (get_ufr (get_cours_from_square square)) player_index game_state.board then
         let diploma_price = get_upgrade_price (get_cours_from_square square)
         in
         if money_player player < diploma_price then Error NotEnoughMoney
@@ -274,7 +273,7 @@ let rec act player play game_state =
                   let updated_square_buyable = update_degre square_buyable in
                   let player = change_money player (-diploma_price) in
                   update_current_player game_state player;
-                  ((Square.get_index_from_square square game_state.board ) |> fun index -> match index with
+                  ((get_index_from_square_board square game_state.board ) |> fun index -> match index with
                   | None ->  Error InvalidSquare;
                   | Some index -> 
                     Board.change_square index (Buyable updated_square_buyable) game_state.board;
@@ -315,7 +314,7 @@ let ask_change game_state endturn turn  =
   print_endline "Voulez-vous échanger une propriété avec un autre joueur ? Tapez 'y' pour échanger ou taper entrer pour passer :";
   match read_line () with
     | "y" -> (
-      let properties_owned = get_properties_owned_by_player game_state.current_index_player game_state.board in
+      let properties_owned = get_properties_owned_by_player_board game_state.current_index_player game_state.board in
       if List.length properties_owned = 0 then
         (print_endline "Vous n'avez pas de propriété à échanger.";
         endturn game_state)
@@ -332,7 +331,7 @@ let ask_change game_state endturn turn  =
           endturn game_state)
         | Some index ->
         if index >= 0 && index < Array.length game_state.players && index != game_state.current_index_player then
-          (let properties = get_properties_owned_by_player index game_state.board in
+          (let properties = get_properties_owned_by_player_board index game_state.board in
           if List.length properties = 0 then
             (print_endline "Ce joueur n'a pas de propriété à échanger.";
             endturn game_state)
@@ -373,12 +372,12 @@ let ask_change game_state endturn turn  =
     | _ -> endturn game_state
 
 
-(* demande uograde propriété *)
+(* demande upgrade propriété *)
 let ask_for_diploma_purchase game_state endturn turn =
 
   let player_index = game_state.current_index_player in
-  let courses = get_courses_owned_by_player player_index game_state.board in
-  let eligible_courses = List.filter (fun square -> owns_all_courses_in_ufr (get_ufr (get_cours_from_square square)) player_index game_state.board) courses in
+  let courses = get_courses_owned_by_player_board player_index game_state.board in
+  let eligible_courses = List.filter (fun square -> owns_all_courses_in_ufr_board (get_ufr (get_cours_from_square square)) player_index game_state.board) courses in
 
   if List.length eligible_courses = 0 then
     ask_change game_state endturn turn
@@ -428,7 +427,10 @@ let rec play (game_state : game_state) =
       match error with
         | NotEnoughMoney -> (print_endline "Vous n'avez pas assez d'argent pour effectuer cette action. Vous avez perdu.";
           (* TODO : Enlever toutes les propriétés du joueur *)
-           Player.eliminate_player (get_current_player game_state) |> fun player -> (
+          let cur_player = (get_current_player game_state) in
+          let player_index = Option.get (find_index_player cur_player game_state.players) in
+           remove_all_properties_board player_index game_state.board;
+           Player.eliminate_player cur_player |> fun player -> (
             update_current_player game_state player;
             endturn game_state)
                  ) 
