@@ -58,7 +58,7 @@ let roll_dices () =
   print_endline "";
   print_endline ("Résultat des dés : " ^ string_of_int d1 ^ " , " ^ string_of_int d2);
   if d1 = d2 then print_endline "Double !";
-  (2, 0)
+  (d1, d2)
 
 (* Handle the int option when finding the index of player *)
 let handle_index_player player game_state f  = 
