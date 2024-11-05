@@ -20,4 +20,8 @@ val get_next_degree_price : Square.cours -> int
 
 val remove_all_properties : int -> Square.square array -> unit
 
+val is_restaurant : Square.square_buyable_type -> bool
 
+val is_library : Square.square_buyable_type -> bool
+
+val is_cours : Square.square_buyable_type -> bool

@@ -1,3 +1,5 @@
 (library
  (name unipoly)
+ (instrumentation (backend bisect_ppx))
  )
+

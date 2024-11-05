@@ -4,23 +4,28 @@
 
 (generate_opam_files true)
 
-(source
- (github username/reponame))
+(source (uri git+https://moule.informatique.univ-paris-diderot.fr/koltes/unipoly))
+(documentation https://moule.informatique.univ-paris-diderot.fr/koltes/unipoly)
+(homepage https://moule.informatique.univ-paris-diderot.fr/koltes/unipoly)
+(bug_reports https://moule.informatique.univ-paris-diderot.fr/koltes/unipoly/-/issues)
 
-(authors "Author Name")
+(authors "Eva Herson" "Lùkas Koltès")
 
-(maintainers "Maintainer Name")
+(maintainers "Eva Herson" "Lùkas Koltès")
 
 (license LICENSE)
 
-(documentation https://url/to/documentation)
-
 (package
  (name unipoly)
- (synopsis "A short synopsis")
- (description "A longer description")
- (depends ocaml dune)
+ (synopsis "Monopoly dans le terminal")
+ (description "Implémentation d'un Monopoly version universitaire dans le terminal")
+ (depends
+    ocaml
+    dune
+    (alcotest :with-test)
+    (bisect_ppx :with-test))
  (tags
-  (topics "to describe" your project)))
+  (monopoly university version)))
+
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/reference/dune-project/index.html

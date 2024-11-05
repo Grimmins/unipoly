@@ -33,5 +33,3 @@ let apply_card_effect (player: player) (card: card)  =
         let player_pos_jailed = change_pos player 10 in
         (toogle_to_jail player_pos_jailed true), false;
       | GetOutOfJail -> (receive_alibi_card player), false;
-     (* | SkipTurn -> { player with skip_turn = true }  on add possibilité de skip turn ? *)
-    (*  | GetOutOfJail -> receive_alibi_card player  Le joueur reçoit une carte spéciale *)
