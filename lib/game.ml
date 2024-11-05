@@ -275,12 +275,12 @@ let rec act player play game_state =
       let player_index = game_state.current_index_player in
       
       
-      let rec buy_diploma list_square game_state = match list_square with
-      | [] -> Next {game_state with timeline = EndTurn}
-      | square :: list -> if owns_all_courses_in_ufr_board (get_ufr (get_cours_from_square square)) player_index game_state.board then
+      let rec buy_diploma list_square game_state_1 player = match list_square with
+      | [] -> Next {game_state_1 with timeline = EndTurn}
+      | square :: list -> if owns_all_courses_in_ufr_board (get_ufr (get_cours_from_square square)) player_index game_state_1.board then
         let diploma_price = get_upgrade_price (get_cours_from_square square)
         in
-        if money_player player < diploma_price then handle_eliminate_player game_state
+        if money_player player < diploma_price then handle_eliminate_player game_state_1
         else
           match square with
           | Buyable square_buyable ->
@@ -288,19 +288,19 @@ let rec act player play game_state =
               | Cours existing_cours when (get_name_cours existing_cours) = (get_name_cours (get_cours_from_square square)) ->
                   let updated_square_buyable = update_degre square_buyable in
                   let player = change_money player (-diploma_price) in
-                  update_current_player game_state player;
-                  ((get_index_from_square_board square game_state.board ) |> fun index -> match index with
+                  update_current_player game_state_1 player;
+                  ((get_index_from_square_board square game_state_1.board ) |> fun index -> match index with
                   | None ->  Error InvalidSquare;
                   | Some index -> 
-                    Board.change_square index (Buyable updated_square_buyable) game_state.board;
-                   print_endline (name_player player ^ " a acheté un diplôme pour " ^ (get_name_cours existing_cours));
-                    buy_diploma list game_state)
+                    Board.change_square index (Buyable updated_square_buyable) game_state_1.board;
+                    print_endline (name_player player ^ " a acheté un diplôme pour " ^ (get_name_cours existing_cours));
+                    buy_diploma list game_state_1 player)
                   
               | _ -> Error InvalidAction)
           | _ -> Error InvalidSquare
       else
         Error InvalidAction
-       in buy_diploma list_square game_state
+       in buy_diploma list_square game_state player
 
 
 let create_game board players = 
