@@ -81,3 +81,5 @@ val get_cours_from_square : square -> cours
 val get_index_from_square : square -> square array -> int option
 
 val get_index_from_square_buyable : square_buyable -> square array -> int option
+
+val get_degre_square : square -> degre option

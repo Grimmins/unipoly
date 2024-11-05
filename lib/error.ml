@@ -5,5 +5,4 @@ type error =
   | InvalidPlayer
   | InvalidBoard
   | InvalidSquare
-  | NotEnoughMoney
   | NoOwner
