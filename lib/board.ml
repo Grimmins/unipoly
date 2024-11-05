@@ -95,13 +95,23 @@ let get_infos (board : board) (players : Player.player array) (k : int) (is_jail
          if List.mem k [0; 2; 7; 17; 20; 22; 30; 33; 36] then
            "  "  (* Afficher "  " pour les cases spécifiques *)
          else
-            let owner = Option.get (get_owner (Option.get (get_square_buyable board.(k))) players) in
-            let owner_index = Option.get (find_index_player owner players) in
-            let num_libraries_owned = Property.count_librairies_owned owner_index board in
-            let owns_all_courses = Property.owns_all_courses_in_ufr (get_ufr (get_cours_from_square board.(k))) owner_index board in
-            let price = get_price num_libraries_owned owns_all_courses board.(k) in
-           string_of_int price ^ "k"  (* Afficher le prix sinon *)
+           let square = board.(k) in
+           (match square with
+           | Tax _ -> string_of_int (get_tax_amount square)
+           | Buyable buyable ->
+               (match get_owner buyable players with
+               | None -> string_of_int (price_buyable (get_type_square buyable)) ^ "k"
+               | Some owner ->
+                   (match find_index_player owner players with
+                   | None -> " "  (* Gérer le cas où l'indice du propriétaire est introuvable *)
+                   | Some owner_index ->
+                       let price = Property.get_price board owner_index square in
+                       if price = 0 then "  " else string_of_int price ^ "k"
+                    )
+               )
+           | _ -> " "  (* Par défaut, afficher un espace *))
      | _ -> get_players list_players padding_size  (* Afficher les joueurs s'il y en a *)
+
    in
 (* Calculer le padding pour centrer le texte, tout en vérifiant que le padding n'est pas négatif *)
    let total_length = String.length content in
@@ -130,7 +140,7 @@ let display_player_status player =
   if is_eliminated player then
     name_player player ^ " est éliminé"
   else
-    name_player player ^ " a " ^ string_of_int (money_player player) ^ "€"
+    name_player player ^ " a " ^ string_of_int (money_player player) ^ "k€"
 
 
 let display (board : board) (players : player array) current_index_player =

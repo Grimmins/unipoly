@@ -36,8 +36,6 @@ val create_buyable : square_buyable_type -> square
 
 val price_buyable : square_buyable_type -> int
 
-val get_price : int -> bool -> square -> int
-
 val get_owner : square_buyable -> Player.player array -> Player.player option
 
 val change_owner : square_buyable -> int option -> square

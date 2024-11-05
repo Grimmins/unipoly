@@ -74,30 +74,6 @@ let update_degre square_buyable =
   | Library _ -> 200
   | Restaurant _ -> 150
 
-  let get_price (num_libraries_owned : int) (owns_all_courses : bool) = function
-    | Tax c -> c.price
-    | Buyable b ->
-        (match b.type_square with
-        | Restaurant _ -> 0
-        | Library _ ->
-            (match b.proprietaire_index with
-            | None -> price_buyable b.type_square
-            | Some _ ->
-                (match num_libraries_owned with
-                | 1 -> 25
-                | 2 -> 50
-                | 3 -> 100
-                | 4 -> 200
-                | _ -> 0))
-        | Cours cours ->
-            (match b.proprietaire_index with
-            | None -> cours.price
-            | Some _ ->
-                let base_price = cours.price in
-                if owns_all_courses then base_price * 2 else base_price))
-    | _ -> 0
-
-
   let get_tax_amount = function
     | Tax t -> t.price
     | _ -> 0

@@ -14,6 +14,8 @@ val get_landing_price : Square.cours -> int
 
 val get_adjusted_course_landing_price : Square.cours -> int -> Square.square array -> int
 
+val get_price : Square.square array -> int -> Square.square -> int
+
 val get_next_degree_price : Square.cours -> int
 
 val remove_all_properties : int -> Square.square array -> unit

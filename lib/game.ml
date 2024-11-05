@@ -57,7 +57,7 @@ let roll_dices () =
   print_endline "";
   print_endline ("Résultat des dés : " ^ string_of_int d1 ^ " , " ^ string_of_int d2);
   if d1 = d2 then print_endline "Double !";
-  (d1, d2)
+  (5, 7)
 
 (* Handle the int option when finding the index of player *)
 let handle_index_player player game_state f  = 
@@ -297,7 +297,7 @@ let create_game board players =
 
 (* demande d'achat d'une propriété *)
 let ask_buy square_buyable =
-  (print_endline ("Voulez-vous acheter " ^ name_square (Buyable (square_buyable)) ^ " pour " ^ string_of_int (price_buyable (get_type_square square_buyable)) ^ "€ ? (y/n)");
+  (print_endline ("Voulez-vous acheter " ^ name_square (Buyable (square_buyable)) ^ " pour " ^ string_of_int (price_buyable (get_type_square square_buyable)) ^ "k€ ? (y/n)");
   let rec ask_buy () =
     match read_line () with
     | "y" -> true

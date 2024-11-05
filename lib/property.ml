@@ -67,6 +67,27 @@ let get_adjusted_course_landing_price cours player_index board =
   else
     base_price
 
+let get_price board player_index square = match square with
+  | Tax _ -> get_tax_amount square
+  | Buyable b ->
+      (match b.type_square with
+      | Restaurant _ -> 0
+      | Library _ ->
+          (match b.proprietaire_index with
+          | None -> price_buyable b.type_square
+          | Some _ ->
+              (match count_librairies_owned player_index board with
+              | 1 -> 25
+              | 2 -> 50
+              | 3 -> 100
+              | 4 -> 200
+              | _ -> 0))
+      | Cours cours ->
+          (match b.proprietaire_index with
+          | None -> price_buyable b.type_square
+          | Some owner_index -> get_adjusted_course_landing_price cours owner_index board))
+  | _ -> 0
+
 let get_next_degree_price cours =
     match (get_degre cours) with
         | Some Doctorat -> 0
