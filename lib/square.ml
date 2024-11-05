@@ -74,12 +74,6 @@ let update_degre square_buyable =
   | Library _ -> 200
   | Restaurant _ -> 150
 
-  let get_price = function
-    | Tax c -> c.price
-    | Buyable b ->
-      price_buyable b.type_square
-    | _ -> 0
-
   let get_tax_amount = function
     | Tax t -> t.price
     | _ -> 0
