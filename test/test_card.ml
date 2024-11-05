@@ -16,35 +16,35 @@ let test_create_card () =
 let test_apply_card_effect_move () =
   let player = create_player "A" in
   let card = create_card "Move" "Move by 3" (Move 3) in
-  let updated_player = apply_card_effect player card in
+  let updated_player, _ = apply_card_effect player card in
   check int "Position après mouvement" 3 (pos_player updated_player)
 
 (* Test de l'application de l'effet GainMoney *)
 let test_apply_card_effect_gain_money () =
   let player = create_player "B" in
   let card = create_card "Gain Money" "Gain 100€" (GainMoney 100) in
-  let updated_player = apply_card_effect player card in
+  let updated_player, _ = apply_card_effect player card in
   check int "Argent après gain" 1600 (money_player updated_player)
 
 (* Test de l'application de l'effet LoseMoney *)
 let test_apply_card_effect_lose_money () =
   let player = create_player "D" in
   let card = create_card "Lose Money" "Lose 50€" (LoseMoney (-50)) in
-  let updated_player = apply_card_effect player card in
+  let updated_player, _ = apply_card_effect player card in
   check int "Argent après perte" 1450 (money_player updated_player)
 
 (* Test de l'application de l'effet GoTo *)
 let test_apply_card_effect_goto () =
   let player = create_player "D" in
   let card = create_card "Go To" "Go to position 10" (GoTo 10) in
-  let updated_player = apply_card_effect player card in
+  let updated_player, _ = apply_card_effect player card in
   check int "Position après GoTo" 10 (pos_player updated_player)
 
 (* Test de l'application de l'effet GoToJail *)
 let test_apply_card_effect_goto_jail () =
   let player = create_player "D" in
   let card = create_card "Go To Jail" "Go directly to jail" GoToJail in
-  let updated_player = apply_card_effect player card in
+  let updated_player, _ = apply_card_effect player card in
   check int "Position après GoToJail" 10 (pos_player updated_player);
   check bool "Le joueur est en prison" true (is_in_jail updated_player)
 
@@ -52,8 +52,9 @@ let test_apply_card_effect_goto_jail () =
 let test_apply_card_effect_get_out_of_jail () =
   let player = create_player "D" in
   let card = create_card "Get Out of Jail" "Use to get out of jail" GetOutOfJail in
-  let updated_player = apply_card_effect player card in
+  let updated_player, _ = apply_card_effect player card in
   check bool "Possède la carte alibi" true (can_use_alibi updated_player)
+
 
 (* Groupe de tests pour le module Card *)
 let () =
