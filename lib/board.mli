@@ -1,16 +1,41 @@
 type board
 
-(* fonction d'affichage *)
+(** [display] displays the board.
+    @param board the board to display
+    @param players the players of the game
+    @param current_player the current player
+    @return unit
+*)
 val display :  board -> Player.player array -> int -> unit
 
-(* fonction de création *)
+(** [init_board] initializes the board.
+    @return board
+*)
 val init_board : unit-> board
 
+(** [index_square] returns the index of the square in the board.
+    @param square the square
+    @param board the board
+    @return index
+*)
 val index_square : Square.square -> Square.square array -> int option
 
+(** [get_square] returns the square at the given index.
+    @param index the index of the square
+    @param board the board
+    @return square
+*)
 val get_square : int -> board -> Square.square
 
+(** [change_square] changes the square at the given index.
+    @param index the index of the square
+    @param square the new square
+    @param board the board
+    @return unit
+*)
 val change_square : int -> Square.square -> board -> unit
+
+(* functions to use other functions with the board *)
 
 val get_adjusted_course_landing_price_board : Square.cours -> int -> board -> int
 
