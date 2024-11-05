@@ -33,7 +33,7 @@ type game_state = {
   type outcome =
   | Next of game_state
   | Error of error
-(*| | Endgame of player option*)
+  | Endgame of player
 
 let find_index p =
   let rec aux i = function
@@ -57,13 +57,26 @@ let roll_dices () =
   print_endline "";
   print_endline ("Résultat des dés : " ^ string_of_int d1 ^ " , " ^ string_of_int d2);
   if d1 = d2 then print_endline "Double !";
-  (5, 7)
+  (d1, d2)
 
 (* Handle the int option when finding the index of player *)
 let handle_index_player player game_state f  = 
   match find_index_player player game_state.players with
   | Some index -> f index
   | None -> Error (InvalidPlayer)
+
+let handle_eliminate_player game_state = (print_endline "Vous n'avez pas assez d'argent pour effectuer cette action. Vous avez perdu.";
+(* TODO : Enlever toutes les propriétés du joueur *)
+let cur_player = (get_current_player game_state) in
+let player_index = Option.get (find_index_player cur_player game_state.players) in
+ remove_all_properties_board player_index game_state.board;
+ Player.eliminate_player cur_player |> fun player -> (
+  update_current_player game_state player;
+  let players_not_eliminated = List.filter (fun p -> not (Player.is_eliminated p)) (Array.to_list game_state.players) in
+  if List.length players_not_eliminated = 1 then
+    Endgame (List.hd players_not_eliminated)
+  else
+    Next {game_state with timeline = EndTurn}))
 
 (* paiement au propriétaire *)
 let pay_owner game_state player square_buyable =
@@ -96,7 +109,7 @@ let pay_owner game_state player square_buyable =
                 print_endline ("Vous louez une salle pour " ^ string_of_int fee ^ "€.");
                 fee
           in
-          if money_player player < amount_to_pay then Error (NotEnoughMoney)
+          if money_player player < amount_to_pay then handle_eliminate_player game_state
           else
             let player = change_money player (-amount_to_pay) in
             let owner = change_money owner amount_to_pay in
@@ -110,11 +123,14 @@ let pay_owner game_state player square_buyable =
 
 
 let rec act player play game_state = 
+  if Player.is_eliminated (get_current_player game_state) then
+    Error InvalidPlayer
+  else
   let goto game_state player i =
 
     update_current_player game_state (change_pos player i);
     act (get_current_player game_state) (Move 0) game_state in
-
+    
 
   match play with
 
@@ -207,7 +223,7 @@ let rec act player play game_state =
           | Tax tax_square ->
             let tax_amount = get_tax_amount (Tax tax_square) in
             if money_player player < tax_amount then
-                Error (NotEnoughMoney)
+              handle_eliminate_player game_state
             else
                 let update_player = change_money player (-tax_amount) in
                 update_current_player game_state update_player;
@@ -218,7 +234,7 @@ let rec act player play game_state =
 
   (* achat d'une propriété *)
    | Buy square_buyable ->
-      if price_buyable (get_type_square square_buyable) > money_player player then Error (NotEnoughMoney)
+      if price_buyable (get_type_square square_buyable) > money_player player then handle_eliminate_player game_state
       else
         change_money player (- price_buyable (get_type_square square_buyable)) |> fun player ->
         change_owner square_buyable (Some (game_state.current_index_player)) |> fun square ->
@@ -230,7 +246,7 @@ let rec act player play game_state =
             Next {game_state with timeline = AskDiploma}
 
   | PayJail -> (
-    if money_player player < 500 then Error (NotEnoughMoney)
+    if money_player player < 500 then handle_eliminate_player game_state
     else (change_money player (- 500) |> fun player ->
       update_current_player game_state (toogle_to_jail player false);
       Next {game_state with timeline = Start}))
@@ -259,12 +275,12 @@ let rec act player play game_state =
       let player_index = game_state.current_index_player in
       
       
-      let rec buy_diploma list_square = match list_square with
+      let rec buy_diploma list_square game_state = match list_square with
       | [] -> Next {game_state with timeline = EndTurn}
       | square :: list -> if owns_all_courses_in_ufr_board (get_ufr (get_cours_from_square square)) player_index game_state.board then
         let diploma_price = get_upgrade_price (get_cours_from_square square)
         in
-        if money_player player < diploma_price then Error NotEnoughMoney
+        if money_player player < diploma_price then handle_eliminate_player game_state
         else
           match square with
           | Buyable square_buyable ->
@@ -278,13 +294,13 @@ let rec act player play game_state =
                   | Some index -> 
                     Board.change_square index (Buyable updated_square_buyable) game_state.board;
                    print_endline (name_player player ^ " a acheté un diplôme pour " ^ (get_name_cours existing_cours));
-                    buy_diploma list)
+                    buy_diploma list game_state)
                   
               | _ -> Error InvalidAction)
           | _ -> Error InvalidSquare
       else
         Error InvalidAction
-       in buy_diploma list_square
+       in buy_diploma list_square game_state
 
 
 let create_game board players = 
@@ -377,14 +393,16 @@ let ask_for_diploma_purchase game_state endturn turn =
 
   let player_index = game_state.current_index_player in
   let courses = get_courses_owned_by_player_board player_index game_state.board in
-  let eligible_courses = List.filter (fun square -> owns_all_courses_in_ufr_board (get_ufr (get_cours_from_square square)) player_index game_state.board) courses in
+  let eligible_courses_with_D = List.filter (fun square -> owns_all_courses_in_ufr_board (get_ufr (get_cours_from_square square)) player_index game_state.board) courses in
+  let eligible_courses = List.filter (fun square -> Option.get (get_degre_square square) != Some Doctorat ) eligible_courses_with_D in 
 
   if List.length eligible_courses = 0 then
     ask_change game_state endturn turn
   else 
+    
     (print_endline "Vous avez la possibilité d'acheter un diplôme pour une de vos matières :";
     List.iter (fun square -> print_endline (string_of_int (Option.get (find_index (fun c -> (get_cours_from_square c) = (get_cours_from_square square)) eligible_courses)) ^ " : " ^ get_name_cours (get_cours_from_square square))) eligible_courses;
-    print_endline "Entrez le(s) numéro(s) de la matière pour lequels vous souhaitez acheter un diplôme ou taper enter pour passer :";
+    print_endline "Entrez le(s) numéro(s) de la matière pour lequels vous souhaitez acheter un diplôme ou taper enter pour passer (séparer les numéros avec des espaces. Ex : 0 2 3";
     match read_line () with
     | "" -> ask_change game_state endturn turn
     | s -> let indices = String.split_on_char ' ' s in
@@ -425,15 +443,6 @@ let rec play (game_state : game_state) =
 
   | Error error -> (
       match error with
-        | NotEnoughMoney -> (print_endline "Vous n'avez pas assez d'argent pour effectuer cette action. Vous avez perdu.";
-          (* TODO : Enlever toutes les propriétés du joueur *)
-          let cur_player = (get_current_player game_state) in
-          let player_index = Option.get (find_index_player cur_player game_state.players) in
-           remove_all_properties_board player_index game_state.board;
-           Player.eliminate_player cur_player |> fun player -> (
-            update_current_player game_state player;
-            endturn game_state)
-                 ) 
 
         | InvalidPlayer -> print_endline "Erreur : joueur introuvable. arrêt du jeu.";
         | NoOwner -> print_endline "Erreur : propriétaire introuvable. arrêt du jeu.";
@@ -443,6 +452,8 @@ let rec play (game_state : game_state) =
         | InvalidAction -> print_endline "Erreur : action impossible. arrêt du jeu.";
 
   )
+
+  | Endgame player -> print_endline (name_player player ^ " a gagné la partie !"); exit 0
 
   (* Next turn *)
   | Next game_state -> match get_timeline game_state with

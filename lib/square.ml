@@ -118,6 +118,10 @@ let get_ufr (c : cours) = c.ufr
 
 let get_degre (c : cours) = c.degre
 
+let get_degre_square = function
+| Buyable {type_square = Cours c; _} -> Some c.degre
+| _ -> None
+
 let get_name_cours (c : cours) = c.name
 
 let get_landing_price (c : cours) = c.landing_price
