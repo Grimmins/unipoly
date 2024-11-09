@@ -85,7 +85,7 @@ let get_infos (board : board) (players : Player.player array) (k : int) (is_jail
      | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 -> 6
      | 11 | 13 | 14 | 16 | 18 | 19 | 31 | 32 | 34 | 37 | 39 -> 7
      | 12 | 15 | 35 -> 8
-     | _ -> 9  (* Par défaut, le padding est de 9 pour les autres cas *)
+     | _ -> 9
    in
 
    (* Déterminer le texte à afficher : soit les joueurs, soit le prix ou "  " *)
@@ -97,7 +97,7 @@ let get_infos (board : board) (players : Player.player array) (k : int) (is_jail
          else
            let square = board.(k) in
            (match square with
-           | Tax _ -> string_of_int (get_tax_amount square)
+           | Tax _ -> string_of_int (get_tax_amount square) ^ "k"
            | Buyable buyable ->
                (match get_owner buyable players with
                | None -> string_of_int (price_buyable (get_type_square buyable)) ^ "k"
@@ -113,17 +113,18 @@ let get_infos (board : board) (players : Player.player array) (k : int) (is_jail
      | _ -> get_players list_players padding_size  (* Afficher les joueurs s'il y en a *)
 
    in
+
 (* Calculer le padding pour centrer le texte, tout en vérifiant que le padding n'est pas négatif *)
-   let total_length = String.length content in
-   if total_length >= padding_size then
-     (* Si le contenu dépasse la taille désirée, on le renvoie tel quel *)
-     content
-   else
-     (* Calcul du padding avec gestion des valeurs positives uniquement *)
-   let padding = max 0 (padding_size - total_length) in
-   let left_padding = padding / 2 in
-   let right_padding = padding - left_padding in
-   String.make left_padding ' ' ^ content ^ String.make right_padding ' ')
+       let total_length = String.length content in
+       if total_length >= padding_size then
+         (* Si le contenu dépasse la taille désirée, on le renvoie tel quel *)
+         content
+       else
+         (* Calcul du padding avec gestion des valeurs positives uniquement *)
+         let padding = max 0 (padding_size - total_length) in
+         let left_padding = padding / 2 in
+         let right_padding = padding - left_padding in
+         String.make left_padding ' ' ^ content ^ String.make right_padding ' ')
 
 let get_degre_char (k : int) (board : board) : string =
   match board.(k) with
@@ -140,7 +141,7 @@ let display_player_status player =
   if is_eliminated player then
     name_player player ^ " est éliminé"
   else
-    name_player player ^ " a " ^ string_of_int (money_player player) ^ "k€"
+    name_player player ^ " a " ^ string_of_int (money_player player) ^ "k"
 
 
 let display (board : board) (players : player array) current_index_player =

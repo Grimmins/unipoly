@@ -95,7 +95,7 @@ let pay_owner game_state player square_buyable =
                   if count_restaurants_owned_board owner_index game_state.board >= 2 then 10 else 4
                 in
                 let fee = (d1 + d2) * multiplier in
-                print_endline ("Vous payez " ^ string_of_int fee ^ "€ de consommation.");
+                print_endline ("Vous payez " ^ string_of_int fee ^ "k de consommation.");
                 fee
             | Library _ ->
                 let fee =
@@ -106,7 +106,7 @@ let pay_owner game_state player square_buyable =
                   | 4 -> 200
                   | _ -> 0
                 in
-                print_endline ("Vous louez une salle pour " ^ string_of_int fee ^ "€.");
+                print_endline ("Vous louez une salle pour " ^ string_of_int fee ^ "k.");
                 fee
           in
           if money_player player < amount_to_pay then handle_eliminate_player game_state
@@ -115,7 +115,7 @@ let pay_owner game_state player square_buyable =
             let owner = change_money owner amount_to_pay in
             update_current_player game_state player;
             game_state.players.(Option.get (find_index_player owner game_state.players)) <- owner;
-            print_endline (name_player player ^ " a payé " ^ string_of_int amount_to_pay ^ "€ à " ^ name_player owner);
+            print_endline (name_player player ^ " a payé " ^ string_of_int amount_to_pay ^ "k à " ^ name_player owner);
             Next { game_state with timeline = AskDiploma }
       | None -> Error (InvalidPlayer))
   | _ ->  (* Aucun propriétaire ou le propriétaire est le joueur lui-même *)
@@ -164,13 +164,13 @@ let rec act player play game_state =
     (*traiter si le joueur passe par la case départ (autrement dit si la position passe de x < 40 à x > 0  ET/OU s'arrête sur la case *)
       let player, stop_on_maison =
               if new_position = 0 then (
-              print_endline "Vous vous arrêtez quelques jours à la maison, vos parents se montrent plus généreux, recevez 400 €";
+              print_endline "Vous vous arrêtez quelques jours à la maison, vos parents se montrent plus généreux, recevez 400 k";
               (change_money player 400, true)
               )
               else (player, false)
           in
           let player =
-                  if old_position > new_position && not stop_on_maison then (print_endline "Vous êtes de passage chez vous, recevez 200 €";
+                  if old_position > new_position && not stop_on_maison then (print_endline "Vous êtes de passage chez vous, recevez 200 k";
                   (change_money player 200)
                   )
                   else player
@@ -227,7 +227,7 @@ let rec act player play game_state =
             else
                 let update_player = change_money player (-tax_amount) in
                 update_current_player game_state update_player;
-                print_endline (name_player player ^ " a payé une taxe de " ^ string_of_int tax_amount ^ "€.");
+                print_endline (name_player player ^ " a payé une taxe de " ^ string_of_int tax_amount ^ "k.");
                 Next { game_state with timeline = AskDiploma }
           | _ ->  Next {game_state with timeline = HandleSquare (Board.get_square (pos_player player) game_state.board)}
             )
@@ -242,7 +242,7 @@ let rec act player play game_state =
             game_state.players.(game_state.current_index_player) <- player;
             Board.change_square (pos_player player) square game_state.board ;
             (* TODO : pas dans la même fonction*)
-            print_endline (name_player player ^ " a acheté " ^ string_of_int (price_buyable (get_type_square square_buyable)) ^ "€ " ^ name_square square);
+            print_endline (name_player player ^ " a acheté " ^ string_of_int (price_buyable (get_type_square square_buyable)) ^ "k " ^ name_square square);
             Next {game_state with timeline = AskDiploma}
 
   | PayJail -> (
@@ -313,7 +313,7 @@ let create_game board players =
 
 (* demande d'achat d'une propriété *)
 let ask_buy square_buyable =
-  (print_endline ("Voulez-vous acheter " ^ name_square (Buyable (square_buyable)) ^ " pour " ^ string_of_int (price_buyable (get_type_square square_buyable)) ^ "k€ ? (y/n)");
+  (print_endline ("Voulez-vous acheter " ^ name_square (Buyable (square_buyable)) ^ " pour " ^ string_of_int (price_buyable (get_type_square square_buyable)) ^ "k ? (y/n)");
   let rec ask_buy () =
     match read_line () with
     | "y" -> true
@@ -473,7 +473,7 @@ let rec play (game_state : game_state) =
 
     | HandleJail -> let rec ask_jail () = (
         print_endline "";
-        print_endline "Vous êtes en prison. Vous avez 3 tours pour sortir. Vous pouvez payer 500€ pour sortir immédiatement.";
+        print_endline "Vous êtes en prison. Vous avez 3 tours pour sortir. Vous pouvez payer 500k pour sortir immédiatement.";
         print_endline ("Vous avez actuellement " ^ string_of_int (Player.get_turn_jail (get_current_player game_state)) ^ " tours en prison.");
         let has_alibi = can_use_alibi (get_current_player game_state) in
         if has_alibi then
