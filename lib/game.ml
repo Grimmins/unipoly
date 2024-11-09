@@ -327,7 +327,7 @@ let ask_buy square_buyable =
 *)
 let ask_change game_state endturn turn  =
   print_endline "";
-  print_endline "Voulez-vous échanger une propriété avec un autre joueur ? Tapez 'y' pour échanger ou taper entrer pour passer :";
+  print_endline "Voulez-vous échanger une propriété avec un autre joueur ? Tapez 'y' pour échanger ou Enter pour passer :";
   match read_line () with
     | "y" -> (
       let properties_owned = get_properties_owned_by_player_board game_state.current_index_player game_state.board in
@@ -360,8 +360,11 @@ let ask_change game_state endturn turn  =
 
             match read_line () with
             | "" -> endturn game_state
-            | s -> let index = int_of_string s in
-
+            | s -> let index = int_of_string_opt s in
+            match index with
+            | None -> (print_endline "Numéro de propriété invalide. Fin de l'échange.";
+              endturn game_state)
+            | Some index ->
               if index >= 0 && index < List.length properties then
                 (print_endline "Voici vos propriétés :";
                 
@@ -370,7 +373,11 @@ let ask_change game_state endturn turn  =
                  (print_endline "Entrez le numéro de la propriété que vous souhaitez donner en échange ou taper enter pour annuler l'échange :";
                 match read_line () with
                 | "" -> endturn game_state
-                | s -> let index_player = int_of_string s in
+                | s -> let index_player = int_of_string_opt s in
+               match index_player with
+               | None -> (print_endline "Numéro de propriété invalide. Fin de l'échange.";
+                 endturn game_state)
+               | Some index_player ->
                   if index_player >= 0 && index_player < List.length properties_owned then
                     (turn (Change (List.nth properties index, List.nth properties_owned index_player)) game_state)
                   else
@@ -405,11 +412,20 @@ let ask_for_diploma_purchase game_state endturn turn =
     print_endline "Entrez le(s) numéro(s) de la matière pour lequels vous souhaitez acheter un diplôme ou taper enter pour passer (séparer les numéros avec des espaces. Ex : 0 2 3";
     match read_line () with
     | "" -> ask_change game_state endturn turn
-    | s -> let indices = String.split_on_char ' ' s in
-      let indices = List.map (fun s -> int_of_string s) indices in
-      let indices = List.filter (fun i -> i >= 0 && i < List.length eligible_courses) indices in
-      let courses_to_buy = List.map (fun i -> List.nth eligible_courses i) indices in
-      turn (BuyDiploma courses_to_buy) game_state)
+    | s ->
+        let indices =
+          try
+            let indices = String.split_on_char ' ' s in
+            List.map int_of_string indices
+          with
+          | Failure _ ->
+          print_endline "Entrée non valide. Fin de l'achat.";
+          []  (* Si la conversion échoue, retourne une liste vide *)
+        in
+        let indices = List.filter (fun i -> i >= 0 && i < List.length eligible_courses) indices in
+        let courses_to_buy = List.map (fun i -> List.nth eligible_courses i) indices in
+        turn (BuyDiploma courses_to_buy) game_state)
+
 
 
 (** [play game_state] is the main function of the game. It displays the board, handles the turn and the end of the turn.
