@@ -609,18 +609,19 @@ and handle_exchange game_state endturn turn =
     endturn game_state)
   else (
     print_endline "Voici les joueurs :";
+    let active_players = Array.of_list (Array.to_list game_state.players |> List.filter (fun player -> not (is_eliminated player))) in
     Array.iteri
       (fun i player ->
         print_endline (string_of_int i ^ " : " ^ name_player player))
-      game_state.players;
+      active_players;
     print_endline
       "Entrez le numéro du joueur avec lequel vous souhaitez échanger ou taper \
        enter pour passer :";
     match read_line () with
     | "" -> endturn game_state
-    | s -> handle_player_selection s game_state endturn turn properties_owned)
+    | s -> handle_player_selection s game_state endturn turn properties_owned active_players)
 
-and handle_player_selection s game_state endturn turn properties_owned =
+and handle_player_selection s game_state endturn turn properties_owned list_players =
   let index = int_of_string_opt s in
   match index with
   | None ->
@@ -629,7 +630,7 @@ and handle_player_selection s game_state endturn turn properties_owned =
   | Some index ->
       if
         index >= 0
-        && index < Array.length game_state.players
+        && index < Array.length list_players
         && index != game_state.current_index_player
       then
         let properties =
