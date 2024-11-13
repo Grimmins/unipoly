@@ -66,7 +66,6 @@ let handle_index_player player game_state f  =
   | None -> Error (InvalidPlayer)
 
 let handle_eliminate_player game_state = (print_endline "Vous n'avez pas assez d'argent pour effectuer cette action. Vous avez perdu.";
-(* TODO : Enlever toutes les propriétés du joueur *)
 let cur_player = (get_current_player game_state) in
 let player_index = Option.get (find_index_player cur_player game_state.players) in
  remove_all_properties_board player_index game_state.board;
@@ -336,7 +335,8 @@ let ask_change game_state endturn turn  =
         endturn game_state)
       else
       print_endline "Voici les joueurs :";
-      Array.iteri (fun i player -> print_endline (string_of_int i ^ " : " ^ name_player player)) game_state.players;
+      let active_players = Array.of_list (Array.to_list game_state.players |> List.filter (fun player -> not (is_eliminated player))) in
+      Array.iteri (fun i player -> print_endline (string_of_int i ^ " : " ^ name_player player)) active_players;
       print_endline "Entrez le numéro du joueur avec lequel vous souhaitez échanger ou taper enter pour passer :";
 
       match read_line () with
@@ -346,7 +346,7 @@ let ask_change game_state endturn turn  =
         | None -> (print_endline "Numéro de joueur invalide. Fin de l'échange.";
           endturn game_state)
         | Some index ->
-        if index >= 0 && index < Array.length game_state.players && index != game_state.current_index_player then
+        if index >= 0 && index < Array.length active_players && index != game_state.current_index_player then
           (let properties = get_properties_owned_by_player_board index game_state.board in
           if List.length properties = 0 then
             (print_endline "Ce joueur n'a pas de propriété à échanger.";
