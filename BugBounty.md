@@ -9,6 +9,7 @@ Cette liste répertorie les bugs connus et les liens vers les issues corresponda
 - [Santorini](#Santorini)
 - [dotsandboxes](#dotsandboxes)
 - [risk_ocaml](#risk_ocaml)
+- [pf5-haddag-betraoui](#pf5-haddag-betraoui)
 
 ---
 
@@ -26,7 +27,7 @@ Cette liste répertorie les bugs connus et les liens vers les issues corresponda
 | **Bug** **/** **Issues**       | **Description**                                                                              | **Lien vers l'issue**                                                                                             | **Status** |
 |--------------------------------|----------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|------------|
 | Readme please                  | Faites un Readme par pitié                                                                   | [Issue #8](https://moule.informatique.univ-paris-diderot.fr/aouini/bataille-navalle/-/issues/8)                   | Closed     |
-| ajout de propositions de tests | ajout d'un test pour compléter les tests de game.ml + proposition pour des tests d'affichage | [Merge-Request #15](https://moule.informatique.univ-paris-diderot.fr/aouini/bataille-navalle/-/merge_requests/15) | Ouvert     |
+| ajout de propositions de tests | ajout d'un test pour compléter les tests de game.ml + proposition pour des tests d'affichage | [Merge-Request #15](https://moule.informatique.univ-paris-diderot.fr/aouini/bataille-navalle/-/merge_requests/15) | Merged     |
 
 ## Santorini
 
@@ -47,10 +48,16 @@ Cette liste répertorie les bugs connus et les liens vers les issues corresponda
 |---------------------|------------------------------------------------|-----------------------------------------------------------------------------------------------|------------|
 | couverture de tests | Une couverture de tests un peu faible à 17.97% | [Issue #16](https://moule.informatique.univ-paris-diderot.fr/coulombe/risk_ocaml/-/issues/16) | Ouvert     |
 
+## pf5-haddag-betraoui
+
+| **Bug** / **Issue**    | **Description**                                                                                                                        | **Lien vers l'issue**                                                                                       | **Status** |
+|------------------------|----------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------|------------|
+| Améliorations globales | Mise à jour du Readme.md ; Ajout de CamlDoc dans les fichiers .mli ; Changements de nom de variables non précis ; Ajout de la pipeline | [Merge-Request #16](https://moule.informatique.univ-paris-diderot.fr/haddag/pf5-project/-/merge_requests/5) | Ouvert     |
 
 ---
 
 ### Légende du Status
 - **Ouvert** : Le bug est identifié mais non résolu.
 - **Closed** : Le bug est corrigé, ou considérée comme non nécessaire par les auteurs.
+- **Merged** : Merge Request acceptée par les auteurs.
 
