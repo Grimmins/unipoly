@@ -50,9 +50,9 @@ Cette liste répertorie les bugs connus et les liens vers les issues corresponda
 
 ## pf5-haddag-betraoui
 
-| **Bug** / **Issue**    | **Description**                                                                                                                        | **Lien vers l'issue**                                                                                       | **Status** |
-|------------------------|----------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------|------------|
-| Améliorations globales | Mise à jour du Readme.md ; Ajout de CamlDoc dans les fichiers .mli ; Changements de nom de variables non précis ; Ajout de la pipeline | [Merge-Request #16](https://moule.informatique.univ-paris-diderot.fr/haddag/pf5-project/-/merge_requests/5) | Ouvert     |
+| **Bug** / **Issue**    | **Description**                                                                                                                        | **Lien vers l'issue**                                                                                      | **Status** |
+|------------------------|----------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|------------|
+| Améliorations globales | Mise à jour du Readme.md ; Ajout de CamlDoc dans les fichiers .mli ; Changements de nom de variables non précis ; Ajout de la pipeline | [Merge-Request #6](https://moule.informatique.univ-paris-diderot.fr/haddag/pf5-project/-/merge_requests/6) | Ouvert     |
 
 ---
 
